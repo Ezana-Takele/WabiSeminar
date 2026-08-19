@@ -1,121 +1,116 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
 import './App.css'
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
+    <div className="app">
+      <aside className="sidebar">
+        <div className="logo">
+          <h2>WabiSeminar</h2>
         </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
 
-      <div className="ticks"></div>
+        <nav>
+          <a className="nav-item active" href="#">
+            Dashboard
+          </a>
 
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
+          <a className="nav-item" href="#">
+            Seminars
+          </a>
 
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
+          <a className="nav-item" href="#">
+            Participants
+          </a>
+
+          <a className="nav-item" href="#">
+            Speakers
+          </a>
+
+          <a className="nav-item" href="#">
+            Schedule
+          </a>
+
+          <a className="nav-item" href="#">
+            Settings
+          </a>
+        </nav>
+      </aside>
+
+      <main className="main-content">
+        <header className="topbar">
+          <div>
+            <h1>Dashboard</h1>
+            <p>Welcome back to WabiSeminar.</p>
+          </div>
+
+          <div className="user-profile">
+            <div className="avatar">T</div>
+            <span>Admin</span>
+          </div>
+        </header>
+
+        <section className="stats">
+          <div className="stat-card">
+            <span>Total Seminars</span>
+            <strong>24</strong>
+          </div>
+
+          <div className="stat-card">
+            <span>Participants</span>
+            <strong>348</strong>
+          </div>
+
+          <div className="stat-card">
+            <span>Speakers</span>
+            <strong>32</strong>
+          </div>
+
+          <div className="stat-card">
+            <span>Upcoming</span>
+            <strong>8</strong>
+          </div>
+        </section>
+
+        <section className="dashboard-section">
+          <div className="section-header">
+            <div>
+              <h2>Upcoming Seminars</h2>
+              <p>Recently scheduled seminars</p>
+            </div>
+
+            <button>View all</button>
+          </div>
+
+          <div className="seminar-list">
+            <div className="seminar-row">
+              <div>
+                <h3>Research Methodology Seminar</h3>
+                <p>August 25, 2026 · Main Hall</p>
+              </div>
+
+              <span className="status">Upcoming</span>
+            </div>
+
+            <div className="seminar-row">
+              <div>
+                <h3>Academic Writing Workshop</h3>
+                <p>August 28, 2026 · Conference Room</p>
+              </div>
+
+              <span className="status">Upcoming</span>
+            </div>
+
+            <div className="seminar-row">
+              <div>
+                <h3>Technology and Innovation</h3>
+                <p>September 2, 2026 · Main Hall</p>
+              </div>
+
+              <span className="status">Upcoming</span>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
   )
 }
 

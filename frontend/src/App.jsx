@@ -3,112 +3,177 @@ import './App.css'
 function App() {
   return (
     <div className="app">
+
+      {/* Sidebar */}
       <aside className="sidebar">
+
         <div className="logo">
           <h2>WabiSeminar</h2>
         </div>
 
         <nav>
           <a className="nav-item active" href="#">
-            Dashboard
+            <span className="nav-icon">⌂</span>
+            Home
           </a>
 
           <a className="nav-item" href="#">
-            Seminars
+            <span className="nav-icon">▣</span>
+            Meetings
           </a>
 
           <a className="nav-item" href="#">
-            Participants
+            <span className="nav-icon">♙</span>
+            People
           </a>
 
           <a className="nav-item" href="#">
-            Speakers
+            <span className="nav-icon">▱</span>
+            Chats
           </a>
 
           <a className="nav-item" href="#">
-            Schedule
+            <span className="nav-icon">□</span>
+            Notes
           </a>
 
           <a className="nav-item" href="#">
+            <span className="nav-icon">⚙</span>
             Settings
           </a>
         </nav>
+
+        <div className="sidebar-bottom">
+          <button className="new-meeting-sidebar">
+            <span>＋</span>
+            New Meeting
+          </button>
+        </div>
+
       </aside>
 
+      {/* Main content */}
       <main className="main-content">
+
+        {/* Header */}
         <header className="topbar">
+
           <div>
-            <h1>Dashboard</h1>
-            <p>Welcome back to WabiSeminar.</p>
+            <h1>Good morning, Tnebeb 👋</h1>
+            <p>Ready for your next meeting?</p>
           </div>
 
           <div className="user-profile">
             <div className="avatar">T</div>
-            <span>Admin</span>
+
+            <div className="user-info">
+              <strong>Tnebeb</strong>
+              <span>Admin</span>
+            </div>
           </div>
+
         </header>
 
-        <section className="stats">
-          <div className="stat-card">
-            <span>Total Seminars</span>
-            <strong>24</strong>
-          </div>
+        {/* Quick Actions */}
+        <section className="quick-actions">
 
-          <div className="stat-card">
-            <span>Participants</span>
-            <strong>348</strong>
-          </div>
+          <button className="action-card primary-action">
+            <div className="action-icon">＋</div>
 
-          <div className="stat-card">
-            <span>Speakers</span>
-            <strong>32</strong>
-          </div>
-
-          <div className="stat-card">
-            <span>Upcoming</span>
-            <strong>8</strong>
-          </div>
-        </section>
-
-        <section className="dashboard-section">
-          <div className="section-header">
             <div>
-              <h2>Upcoming Seminars</h2>
-              <p>Recently scheduled seminars</p>
+              <strong>New Meeting</strong>
+              <span>Create a new meeting</span>
             </div>
+          </button>
 
-            <button>View all</button>
-          </div>
+          <button className="action-card">
+            <div className="action-icon">↗</div>
 
-          <div className="seminar-list">
-            <div className="seminar-row">
-              <div>
-                <h3>Research Methodology Seminar</h3>
-                <p>August 25, 2026 · Main Hall</p>
-              </div>
-
-              <span className="status">Upcoming</span>
+            <div>
+              <strong>Join Meeting</strong>
+              <span>Enter a meeting code</span>
             </div>
+          </button>
 
-            <div className="seminar-row">
-              <div>
-                <h3>Academic Writing Workshop</h3>
-                <p>August 28, 2026 · Conference Room</p>
-              </div>
+          <button className="action-card">
+            <div className="action-icon">▣</div>
 
-              <span className="status">Upcoming</span>
+            <div>
+              <strong>Schedule</strong>
+              <span>Plan a future meeting</span>
             </div>
+          </button>
 
-            <div className="seminar-row">
-              <div>
-                <h3>Technology and Innovation</h3>
-                <p>September 2, 2026 · Main Hall</p>
-              </div>
-
-              <span className="status">Upcoming</span>
-            </div>
-          </div>
         </section>
+
+        {/* Upcoming Meetings */}
+        <section className="dashboard-section">
+
+          <div className="section-header">
+
+            <div>
+              <h2>Upcoming Meetings</h2>
+              <p>Your next scheduled meetings</p>
+            </div>
+
+            <button className="view-all">
+              View all
+            </button>
+
+          </div>
+
+          <div className="empty-state">
+
+            <div className="empty-icon">
+              📅
+            </div>
+
+            <h3>No upcoming meetings</h3>
+
+            <p>
+              You don't have any meetings scheduled yet.
+            </p>
+
+            <button className="empty-action">
+              Schedule Meeting
+            </button>
+
+          </div>
+
+        </section>
+
+        {/* Recent Meetings */}
+        <section className="dashboard-section recent-section">
+
+          <div className="section-header">
+
+            <div>
+              <h2>Recent Meetings</h2>
+              <p>Your recently completed meetings</p>
+            </div>
+
+            <button className="view-all">
+              View history
+            </button>
+
+          </div>
+
+          <div className="empty-state">
+
+            <div className="empty-icon">
+              🕘
+            </div>
+
+            <h3>No recent meetings</h3>
+
+            <p>
+              Your completed meetings will appear here.
+            </p>
+
+          </div>
+
+        </section>
+
       </main>
     </div>
   )

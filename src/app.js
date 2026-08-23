@@ -2,11 +2,12 @@ const express = require("express");
 const cors = require("cors");
 require("dotenv").config();
 const pool = require("./config/database");
+const meetingRoutes = require("./routes/meetingRoutes");
 const app = express();
 
 app.use(cors());
 app.use(express.json());
-
+app.use("/api/meetings", meetingRoutes);
 app.get("/", (req, res) => {
     res.json({
         message: "WabiSeminar backend is running 🚀"

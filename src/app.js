@@ -3,15 +3,33 @@ const cors = require("cors");
 require("dotenv").config();
 const pool = require("./config/database");
 const meetingRoutes = require("./routes/meetingRoutes");
+const participantRoutes = require("./routes/participantRoutes");
 const app = express();
 
 app.use(cors());
 app.use(express.json());
 app.use("/api/meetings", meetingRoutes);
+app.use("/api/participants", participantRoutes);
 app.get("/", (req, res) => {
     res.json({
         message: "WabiSeminar backend is running 🚀"
     });
+});
+
+app.get("/api/test-db-name", async (req, res) => {
+    try {
+        const [rows] = await pool.query(
+            "SELECT DATABASE() AS database_name"
+        );
+
+        res.json(rows);
+    } catch (error) {
+        console.error(error);
+
+        res.status(500).json({
+            message: "Database check failed"
+        });
+    }
 });
 
 const PORT = process.env.PORT || 5000;

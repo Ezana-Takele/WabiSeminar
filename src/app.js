@@ -4,12 +4,14 @@ require("dotenv").config();
 const pool = require("./config/database");
 const meetingRoutes = require("./routes/meetingRoutes");
 const participantRoutes = require("./routes/participantRoutes");
+const messageRoutes = require("./routes/messageRoutes");
 const app = express();
 
 app.use(cors());
 app.use(express.json());
 app.use("/api/meetings", meetingRoutes);
 app.use("/api/participants", participantRoutes);
+app.use("/api/meetings", messageRoutes);
 app.get("/", (req, res) => {
     res.json({
         message: "WabiSeminar backend is running 🚀"
@@ -33,6 +35,9 @@ app.get("/api/test-db-name", async (req, res) => {
 });
 
 const PORT = process.env.PORT || 5000;
+
+console.log("MESSAGE ROUTES LOADED");
+console.log("Message endpoint: POST /api/messages/:id/messages");
 
 app.listen(PORT, () => {
     console.log(`WabiSeminar server running on port ${PORT}`);

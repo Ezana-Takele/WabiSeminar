@@ -7,6 +7,7 @@ const participantRoutes = require("./routes/participantRoutes");
 const messageRoutes = require("./routes/messageRoutes");
 const noteRoutes = require("./routes/noteRoutes");
 const pollRoutes = require("./routes/pollRoutes");
+const agendaRoutes = require("./routes/agendaRoutes");
 const app = express();
 
 app.use(cors());
@@ -16,6 +17,7 @@ app.use("/api/meetings", participantRoutes);
 app.use("/api/meetings", messageRoutes);
 app.use("/api/meetings", noteRoutes);
 app.use("/api/meetings", pollRoutes);
+app.use("/api/meetings", agendaRoutes);
 
 app.get("/", (req, res) => {
     res.json({

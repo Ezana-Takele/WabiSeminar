@@ -5,6 +5,7 @@ const pool = require("./config/database");
 const meetingRoutes = require("./routes/meetingRoutes");
 const participantRoutes = require("./routes/participantRoutes");
 const messageRoutes = require("./routes/messageRoutes");
+const noteRoutes = require("./routes/noteRoutes");
 const app = express();
 
 app.use(cors());
@@ -12,6 +13,8 @@ app.use(express.json());
 app.use("/api/meetings", meetingRoutes);
 app.use("/api/participants", participantRoutes);
 app.use("/api/meetings", messageRoutes);
+app.use("/api/meetings", noteRoutes);
+
 app.get("/", (req, res) => {
     res.json({
         message: "WabiSeminar backend is running 🚀"

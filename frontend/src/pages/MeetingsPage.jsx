@@ -1,34 +1,24 @@
 import { useEffect, useState } from 'react'
 import { NavLink } from 'react-router-dom'
+import { apiRequest } from '../services/api'
 import '../App.css'
 
 function MeetingsPage() {
   const [meetings, setMeetings] = useState([])
 
   useEffect(() => {
-    const loadMeetings = () => {
-      const savedMeetings =
-        JSON.parse(
-          localStorage.getItem('wabiMeetings')
-        ) || []
+  const loadMeetings = async () => {
+    try {
+      const data = await apiRequest('/meetings')
 
-      setMeetings(savedMeetings)
+      setMeetings(data)
+    } catch (err) {
+      console.error('Failed to load meetings:', err)
     }
+  }
 
-    loadMeetings()
-
-    window.addEventListener(
-      'storage',
-      loadMeetings
-    )
-
-    return () => {
-      window.removeEventListener(
-        'storage',
-        loadMeetings
-      )
-    }
-  }, [])
+  loadMeetings()
+}, [])
 
   /* ========================================
      UPCOMING

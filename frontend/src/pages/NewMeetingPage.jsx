@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { NavLink, useNavigate } from 'react-router-dom'
+import { apiRequest } from '../services/api'
 import '../App.css'
 
 function NewMeetingPage() {
@@ -22,43 +23,53 @@ function NewMeetingPage() {
     }))
   }
 
-  const handleSubmit = (e) => {
-    e.preventDefault()
+ const handleSubmit = async (e) => {
+  e.preventDefault()
 
-    if (!formData.title.trim() || !formData.date || !formData.time) {
-      alert('Please fill in the meeting title, date, and time.')
+  if (
+    !formData.title.trim() ||
+    !formData.date ||
+    !formData.time
+  ) {
+    alert('Please fill in the meeting title, date, and time.')
+    return
+  }
+
+  try {
+    const currentUser = JSON.parse(
+      localStorage.getItem('wabiCurrentUser')
+    )
+
+    if (!currentUser) {
+      alert('Please log in first.')
+      navigate('/login')
       return
     }
 
-    const existingMeetings =
-      JSON.parse(localStorage.getItem('wabiMeetings')) || []
-
     const newMeeting = {
-      id: String(Date.now()),
+      host_id: currentUser.id,
       title: formData.title.trim(),
+      description: formData.description.trim(),
       date: formData.date,
       time: formData.time,
-      duration: formData.duration,
-      description: formData.description.trim(),
-
-      // Important:
-      // A newly created meeting has NOT been completed.
-      completed: false,
-      joined: false,
+      duration: Number(formData.duration),
     }
 
-    const updatedMeetings = [
-      ...existingMeetings,
-      newMeeting,
-    ]
-
-    localStorage.setItem(
-      'wabiMeetings',
-      JSON.stringify(updatedMeetings)
-    )
+    await apiRequest('/meetings', {
+      method: 'POST',
+      body: JSON.stringify(newMeeting),
+    })
 
     navigate('/dashboard')
+
+  } catch (error) {
+    console.error('Create meeting error:', error)
+
+    alert(
+      error.message || 'Failed to create meeting.'
+    )
   }
+}
 
   return (
     <div className="app">

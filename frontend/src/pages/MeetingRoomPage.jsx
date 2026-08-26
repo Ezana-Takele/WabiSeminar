@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { NavLink, useNavigate, useParams } from 'react-router-dom'
+import { apiRequest } from '../services/api'
 import '../App.css'
 
 function MeetingRoomPage() {
@@ -16,8 +17,10 @@ function MeetingRoomPage() {
 
   const [message, setMessage] = useState('')
   const [messages, setMessages] = useState([])
+  const [participants, setParticipants] = useState([])
 
   const [meeting, setMeeting] = useState(null)
+  
 
   /* ========================================
      MEETING TOOLS
@@ -51,21 +54,47 @@ function MeetingRoomPage() {
   ======================================== */
 
   useEffect(() => {
-    const meetings =
-      JSON.parse(
-        localStorage.getItem('wabiMeetings')
-      ) || []
-
-    const foundMeeting =
-      meetings.find(
-        (item) =>
-          String(item.id) ===
-          String(meetingId)
+  const loadMeeting = async () => {
+    try {
+      const result = await apiRequest(
+        `/meetings/${meetingId}`
       )
 
-    setMeeting(foundMeeting || null)
-  }, [meetingId])
+      if (!result || result.length === 0) {
+        setMeeting(null)
+        return
+      }
 
+      setMeeting(result[0])
+
+    } catch (error) {
+      console.error('Load meeting error:', error)
+      setMeeting(null)
+    }
+  }
+
+  loadMeeting()
+}, [meetingId])
+
+useEffect(() => {
+  const loadParticipants = async () => {
+    try {
+      const result = await apiRequest(
+        `/meetings/${meetingId}/participants`
+      )
+
+      setParticipants(result.participants || [])
+
+    } catch (error) {
+      console.error(
+        'Load participants error:',
+        error
+      )
+    }
+  }
+
+  loadParticipants()
+}, [meetingId])
 
   /* ========================================
      LOAD MEETING DATA

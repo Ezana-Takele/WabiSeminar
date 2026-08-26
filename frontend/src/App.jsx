@@ -31,7 +31,7 @@ function App() {
 
         <Route path="/join-meeting" element={<JoinMeetingPage />} />
 
-        <Route path="/meeting-room/:id" element={<MeetingRoomPage />} />
+        <Route path="/meeting-room/:meetingId" element={<MeetingRoomPage />} />
 
         <Route path="/chats" element={<ChatsPage />} />
 

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { NavLink, useNavigate, useParams } from 'react-router-dom'
+import { apiRequest } from '../services/api'
 import '../App.css'
 
 function JoinMeetingPage() {
@@ -15,60 +16,89 @@ function JoinMeetingPage() {
     find that meeting and redirect to the meeting room.
   */
   useEffect(() => {
-    if (!meetingId) {
-      return
-    }
+  if (!meetingId) {
+    return
+  }
 
-    const savedMeetings =
-      JSON.parse(localStorage.getItem('wabiMeetings')) || []
+  const joinMeetingFromUrl = async () => {
+    try {
+      const currentUser = JSON.parse(
+        localStorage.getItem('wabiCurrentUser')
+      )
 
-    const selectedMeeting = savedMeetings.find(
-      (item) => String(item.id) === String(meetingId)
-    )
+      if (!currentUser) {
+        setError('Please log in first.')
+        navigate('/login')
+        return
+      }
 
-    if (selectedMeeting) {
-      setMeeting(selectedMeeting)
+      await apiRequest(`/meetings/${meetingId}/join`, {
+        method: 'POST',
+        body: JSON.stringify({
+          user_id: currentUser.id,
+        }),
+      })
 
-      navigate(`/meeting-room/${selectedMeeting.id}`, {
+      navigate(`/meeting-room/${meetingId}`, {
         replace: true,
       })
-    } else {
-      setError('Meeting not found.')
+
+    } catch (error) {
+      console.error('Join meeting error:', error)
+
+      setError(
+        error.message || 'Failed to join meeting.'
+      )
     }
-  }, [meetingId, navigate])
+  }
+
+  joinMeetingFromUrl()
+}, [meetingId, navigate])
 
   /*
     Join meeting using meeting code
   */
-  const handleSubmit = (e) => {
-    e.preventDefault()
+  const handleSubmit = async (e) => {
+  e.preventDefault()
 
-    const code = meetingCode.trim()
+  const code = meetingCode.trim()
 
-    if (!code) {
-      setError('Please enter a meeting code.')
-      return
-    }
+  if (!code) {
+    setError('Please enter a meeting code.')
+    return
+  }
 
-    const savedMeetings =
-      JSON.parse(localStorage.getItem('wabiMeetings')) || []
-
-    const selectedMeeting = savedMeetings.find(
-      (item) => String(item.id) === String(code)
+  try {
+    const currentUser = JSON.parse(
+      localStorage.getItem('wabiCurrentUser')
     )
 
-    if (!selectedMeeting) {
-      setError(
-        'Meeting not found. Please enter a valid meeting code.'
-      )
+    if (!currentUser) {
+      setError('Please log in first.')
+      navigate('/login')
       return
     }
 
     setError('')
 
-    navigate(`/meeting-room/${selectedMeeting.id}`)
-  }
+    await apiRequest(`/meetings/${code}/join`, {
+      method: 'POST',
+      body: JSON.stringify({
+        user_id: currentUser.id,
+      }),
+    })
 
+    navigate(`/meeting-room/${code}`)
+
+  } catch (error) {
+    console.error('Join meeting error:', error)
+
+    setError(
+      error.message ||
+      'Meeting not found or could not be joined.'
+    )
+  }
+}
   /*
     If this page is being used with /join-meeting/:meetingId
   */

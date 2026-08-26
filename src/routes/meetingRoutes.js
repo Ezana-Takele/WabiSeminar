@@ -118,35 +118,41 @@ res.status(201).json({
     }
 });
 
-// GET: Fetch meeting participants
-router.get("/:id/participants", async (req, res) => {
+// GET: Fetch one meeting
+router.get("/:id", async (req, res) => {
     const meetingId = req.params.id;
 
     try {
-        const [participants] = await pool.query(
-            `SELECT 
-                mp.id,
-                mp.meeting_id,
-                mp.user_id,
-                u.name,
-                u.email,
-                mp.joined_at,
-                mp.left_at
-             FROM meeting_participants mp
-             JOIN users u ON mp.user_id = u.id
-             WHERE mp.meeting_id = ?`,
+        const [meetings] = await pool.query(
+            `SELECT
+                id,
+                host_id,
+                title,
+                description,
+                date,
+                time,
+                duration,
+                completed,
+                created_at,
+                updated_at
+             FROM meetings
+             WHERE id = ?`,
             [meetingId]
         );
 
-        res.json({
-            meeting_id: Number(meetingId),
-            participants
-        });
+        if (meetings.length === 0) {
+            return res.status(404).json({
+                message: "Meeting not found"
+            });
+        }
+
+        res.json(meetings[0]);
 
     } catch (error) {
-        console.error("Get participants error:", error);
+        console.error("Get meeting error:", error);
+
         res.status(500).json({
-            message: "Failed to get participants"
+            message: "Failed to get meeting"
         });
     }
 });

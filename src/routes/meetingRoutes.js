@@ -3,6 +3,36 @@ const pool = require("../config/database");
 
 const router = express.Router();
 
+// GET: Fetch all meetings
+router.get("/", async (req, res) => {
+    try {
+        const [meetings] = await pool.query(
+            `SELECT
+                id,
+                host_id,
+                title,
+                description,
+                date,
+                time,
+                duration,
+                completed,
+                created_at,
+                updated_at
+             FROM meetings
+             ORDER BY date ASC, time ASC`
+        );
+
+        res.json(meetings);
+
+    } catch (error) {
+        console.error("Get meetings error:", error);
+
+        res.status(500).json({
+            message: "Failed to get meetings"
+        });
+    }
+});
+
 // POST: Join a meeting
 router.post("/:id/join", async (req, res) => {
     const meetingId = req.params.id;
@@ -81,12 +111,6 @@ res.status(201).json({
     user_id: Number(user_id)
 });
 
-        res.status(201).json({
-            message: "Successfully joined meeting",
-            participant_id: result.insertId,
-            meeting_id: Number(meetingId),
-            user_id: Number(user_id)
-        });
 
     } catch (error) {
         console.error("Join meeting error:", error);

@@ -1,0 +1,461 @@
+
+/* ========================================
+   SETTINGS PAGE
+======================================== */
+
+.settings-page {
+  min-height: 100vh;
+  padding: 28px 34px 50px;
+  box-sizing: border-box;
+}
+
+
+/* ========================================
+   HEADER
+======================================== */
+
+.settings-page .topbar {
+  margin: 0 0 26px;
+}
+
+.settings-page .topbar h1 {
+  margin: 0;
+  color: #1d2635;
+  font-size: 28px;
+  font-weight: 750;
+  line-height: 1.2;
+  letter-spacing: -0.5px;
+}
+
+.settings-page .topbar p {
+  margin: 6px 0 0;
+  color: #89919d;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+
+/* ========================================
+   SECTION
+======================================== */
+
+.settings-section {
+  margin: 0 0 22px;
+}
+
+.settings-section-header {
+  margin: 0 0 9px;
+}
+
+.settings-section-header h2 {
+  margin: 0;
+  color: #293241;
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.settings-section-header p {
+  margin: 3px 0 0;
+  color: #9098a4;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+
+/* ========================================
+   CARD
+======================================== */
+
+.settings-card {
+  width: 100%;
+  box-sizing: border-box;
+  background: #ffffff;
+  border: 1px solid #e7eaee;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(25, 35, 50, 0.025);
+}
+
+
+/* ========================================
+   PROFILE
+======================================== */
+
+.settings-profile {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 15px 18px;
+  border-bottom: 1px solid #edf0f2;
+}
+
+.settings-avatar {
+  width: 43px;
+  height: 43px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 11px;
+  background: #eef1ff;
+  color: #5c68c6;
+  font-size: 16px;
+  font-weight: 750;
+}
+
+.settings-profile strong {
+  display: block;
+  color: #27303e;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.settings-profile span {
+  display: block;
+  margin-top: 2px;
+  color: #929aa5;
+  font-size: 11px;
+}
+
+
+/* ========================================
+   PROFILE FORM
+======================================== */
+
+.settings-form {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 15px;
+  padding: 15px 18px 17px;
+}
+
+.settings-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.settings-form-group label {
+  color: #596271;
+  font-size: 11.5px;
+  font-weight: 650;
+}
+
+.settings-form-group input {
+  width: 100%;
+  height: 38px;
+  box-sizing: border-box;
+  padding: 0 11px;
+  border: 1px solid #dfe3e8;
+  border-radius: 8px;
+  outline: none;
+  background: #fcfcfd;
+  color: #27303e;
+  font-family: inherit;
+  font-size: 12.5px;
+  transition:
+    border-color 0.16s ease,
+    box-shadow 0.16s ease,
+    background 0.16s ease;
+}
+
+.settings-form-group input::placeholder {
+  color: #aab0b8;
+}
+
+.settings-form-group input:hover {
+  border-color: #d1d6dd;
+  background: #ffffff;
+}
+
+.settings-form-group input:focus {
+  border-color: #727dd1;
+  background: #ffffff;
+  box-shadow: 0 0 0 3px rgba(114, 125, 209, 0.1);
+}
+
+
+/* ========================================
+   SETTINGS OPTIONS
+======================================== */
+
+.settings-options {
+  padding: 0 18px;
+}
+
+.setting-option {
+  min-height: 62px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 11px 0;
+}
+
+.setting-option + .setting-option {
+  border-top: 1px solid #edf0f2;
+}
+
+.setting-option > div {
+  min-width: 0;
+}
+
+.setting-option strong {
+  display: block;
+  color: #303948;
+  font-size: 12.5px;
+  font-weight: 650;
+  line-height: 1.3;
+}
+
+.setting-option span:not(.toggle span) {
+  display: block;
+  margin-top: 3px;
+  color: #929aa5;
+  font-size: 11px;
+  line-height: 1.35;
+}
+
+
+/* ========================================
+   TOGGLE
+======================================== */
+
+.toggle {
+  position: relative;
+  width: 40px;
+  height: 22px;
+  flex-shrink: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: #d9dde3;
+  cursor: pointer;
+  transition: background 0.18s ease;
+}
+
+.toggle span {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow: 0 1px 4px rgba(20, 30, 45, 0.2);
+  transition: transform 0.18s ease;
+}
+
+.toggle.on {
+  background: #6571cc;
+}
+
+.toggle.on span {
+  transform: translateX(18px);
+}
+
+.toggle:hover {
+  background: #cbd0d8;
+}
+
+.toggle.on:hover {
+  background: #5965c1;
+}
+
+.toggle:focus-visible {
+  outline: 3px solid rgba(101, 113, 204, 0.15);
+  outline-offset: 2px;
+}
+
+
+/* ========================================
+   SAVE ACTION
+======================================== */
+
+.settings-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  margin: -2px 0 28px;
+}
+
+.settings-saved {
+  color: #43805c;
+  font-size: 11.5px;
+  font-weight: 650;
+}
+
+.settings-actions .create-meeting-button {
+  min-width: 116px;
+  height: 37px;
+  padding: 0 15px;
+  border: 0;
+  border-radius: 8px;
+  background: #5966c7;
+  color: #ffffff;
+  font-family: inherit;
+  font-size: 11.5px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 3px 10px rgba(89, 102, 199, 0.15);
+  transition:
+    background 0.16s ease,
+    transform 0.16s ease,
+    box-shadow 0.16s ease;
+}
+
+.settings-actions .create-meeting-button:hover {
+  background: #4f5cba;
+  transform: translateY(-1px);
+  box-shadow: 0 5px 14px rgba(89, 102, 199, 0.2);
+}
+
+.settings-actions .create-meeting-button:active {
+  transform: translateY(0);
+}
+
+
+/* ========================================
+   DATA / DANGER
+======================================== */
+
+.danger-section {
+  margin-bottom: 0;
+}
+
+.danger-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 15px 18px;
+  border-color: #eddfe0;
+  background: #fffdfd;
+}
+
+.danger-card strong {
+  display: block;
+  color: #91464b;
+  font-size: 12.5px;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.danger-card span {
+  display: block;
+  margin-top: 3px;
+  color: #9b7f81;
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+.reset-data-button {
+  height: 34px;
+  flex-shrink: 0;
+  padding: 0 13px;
+  border: 1px solid #e2bfc2;
+  border-radius: 7px;
+  background: #ffffff;
+  color: #a1484e;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    background 0.16s ease,
+    border-color 0.16s ease,
+    color 0.16s ease;
+}
+
+.reset-data-button:hover {
+  border-color: #d69ca1;
+  background: #fff5f5;
+  color: #913b41;
+}
+
+
+/* ========================================
+   RESPONSIVE
+======================================== */
+
+@media (max-width: 900px) {
+  .settings-page {
+    padding: 24px 24px 45px;
+  }
+
+  .settings-form {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+@media (max-width: 700px) {
+  .settings-page {
+    padding: 20px 16px 40px;
+  }
+
+  .settings-page .topbar {
+    margin-bottom: 22px;
+  }
+
+  .settings-page .topbar h1 {
+    font-size: 25px;
+  }
+
+  .settings-section {
+    margin-bottom: 19px;
+  }
+
+  .settings-profile {
+    padding: 14px 15px;
+  }
+
+  .settings-form {
+    padding: 14px 15px 15px;
+  }
+
+  .settings-options {
+    padding: 0 15px;
+  }
+
+  .setting-option {
+    min-height: 60px;
+  }
+
+  .danger-card {
+    align-items: flex-start;
+    flex-direction: column;
+    padding: 15px;
+  }
+
+  .reset-data-button {
+    width: 100%;
+  }
+
+  .settings-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .settings-actions .create-meeting-button {
+    width: 100%;
+  }
+}
+
+
+@media (max-width: 480px) {
+  .settings-page {
+    padding: 18px 12px 35px;
+  }
+
+  .settings-form {
+    grid-template-columns: 1fr;
+  }
+
+  .setting-option {
+    gap: 12px;
+  }
+}

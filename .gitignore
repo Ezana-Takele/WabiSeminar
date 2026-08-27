@@ -1,2 +1,23 @@
+# Dependencies
 node_modules/
+frontend/node_modules/
+
+# Environment files
 .env
+.env.local
+.env.*.local
+
+# Build outputs
+dist/
+frontend/dist/
+
+# Uploads & logs
+uploads/*
+!uploads/.gitkeep
+*.log
+
+# OS & Editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

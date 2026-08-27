@@ -33,6 +33,64 @@ router.get("/", async (req, res) => {
     }
 });
 
+// POST: Create a new meeting
+router.post("/", async (req, res) => {
+    try {
+        const {
+            host_id,
+            title,
+            description,
+            date,
+            time,
+            duration
+        } = req.body;
+
+        const effectiveHostId = host_id || 1;
+
+        if (!title || !date || !time) {
+            return res.status(400).json({
+                message: "Title, date, and time are required"
+            });
+        }
+
+        const [result] = await pool.query(
+            `INSERT INTO meetings
+            (host_id, title, description, date, time, duration, completed)
+            VALUES (?, ?, ?, ?, ?, ?, ?)`,
+            [
+                effectiveHostId,
+                title,
+                description || null,
+                date,
+                time,
+                duration || 30,
+                false
+            ]
+        );
+
+        res.status(201).json({
+            message: "Meeting created successfully",
+            meeting: {
+                id: result.insertId,
+                host_id: effectiveHostId,
+                title,
+                description: description || null,
+                date,
+                time,
+                duration: duration || 30,
+                completed: false
+            }
+        });
+
+    } catch (error) {
+        console.error("Create meeting error:", error);
+
+        res.status(500).json({
+            message: "Server error while creating meeting"
+        });
+    }
+});
+
 // POST: Join a meeting
 router.post("/:id/join", async (req, res) => {
     const meetingId = req.params.id;

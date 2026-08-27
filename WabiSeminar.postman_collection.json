@@ -1,0 +1,587 @@
+{
+  "info": {
+    "name": "WabiSeminar API",
+    "description": "Postman collection for testing WabiSeminar REST API endpoints.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5000/api",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "meetingId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "userId",
+      "value": "1",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "1. Authentication",
+      "item": [
+        {
+          "name": "Register User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Postman Tester\",\n  \"email\": \"tester@wabiseminar.com\",\n  \"password\": \"Password123!\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/register",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "register"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Login User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"alex@wabiseminar.com\",\n  \"password\": \"Password123!\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Meetings",
+      "item": [
+        {
+          "name": "Get All Meetings",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/meetings",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "meetings"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Single Meeting by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/meetings/{{meetingId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "meetings",
+                "{{meetingId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create New Meeting",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"host_id\": 1,\n  \"title\": \"Postman Verified Seminar\",\n  \"description\": \"Interactive demo meeting created from Postman\",\n  \"date\": \"2026-08-30\",\n  \"time\": \"04:00 PM\",\n  \"duration\": 60\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/meetings",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "meetings"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Join Meeting",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"user_id\": 1\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/meetings/{{meetingId}}/join",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "meetings",
+                "{{meetingId}}",
+                "join"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Meeting Participants",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/meetings/{{meetingId}}/participants",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "meetings",
+                "{{meetingId}}",
+                "participants"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Leave Meeting",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"user_id\": 1\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/meetings/{{meetingId}}/leave",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "meetings",
+                "{{meetingId}}",
+                "leave"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Meeting Chat",
+      "item": [
+        {
+          "name": "Get Meeting Messages",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/meetings/{{meetingId}}/messages",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "meetings",
+                "{{meetingId}}",
+                "messages"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Send Message to Chat",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"message\": \"Hello from Postman!\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/meetings/{{meetingId}}/messages",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "meetings",
+                "{{meetingId}}",
+                "messages"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. Meeting Notes",
+      "item": [
+        {
+          "name": "Get Meeting Notes",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/meetings/{{meetingId}}/notes",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "meetings",
+                "{{meetingId}}",
+                "notes"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Save or Create Note",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"content\": \"Key meeting note created via Postman testing.\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/meetings/{{meetingId}}/notes",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "meetings",
+                "{{meetingId}}",
+                "notes"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "5. Meeting Polls",
+      "item": [
+        {
+          "name": "Get All Polls in Meeting",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/meetings/{{meetingId}}/polls",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "meetings",
+                "{{meetingId}}",
+                "polls"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create Poll",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"question\": \"Which presentation format do you prefer?\",\n  \"options\": [\n    \"Slide deck + Live demo\",\n    \"Interactive QA only\"\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/meetings/{{meetingId}}/polls",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "meetings",
+                "{{meetingId}}",
+                "polls"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Vote on Poll",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"option_id\": 1\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/meetings/{{meetingId}}/polls/1/vote",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "meetings",
+                "{{meetingId}}",
+                "polls",
+                "1",
+                "vote"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Poll Results",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/meetings/{{meetingId}}/polls/1/results",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "meetings",
+                "{{meetingId}}",
+                "polls",
+                "1",
+                "results"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "6. Meeting Agenda",
+      "item": [
+        {
+          "name": "Get Agenda Items",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/meetings/{{meetingId}}/agenda",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "meetings",
+                "{{meetingId}}",
+                "agenda"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create Agenda Item",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Live Product Architecture Walkthrough\",\n  \"position\": 0\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/meetings/{{meetingId}}/agenda",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "meetings",
+                "{{meetingId}}",
+                "agenda"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "7. Meeting Files",
+      "item": [
+        {
+          "name": "Get Meeting Files",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/meetings/{{meetingId}}/files",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "meetings",
+                "{{meetingId}}",
+                "files"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Upload File (Form-Data)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "description": "Select any test file from your computer"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/meetings/{{meetingId}}/files",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "meetings",
+                "{{meetingId}}",
+                "files"
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -60,12 +60,13 @@ function MeetingRoomPage() {
         `/meetings/${meetingId}`
       )
 
-      if (!result || result.length === 0) {
+      if (!result) {
         setMeeting(null)
         return
       }
 
-      setMeeting(result[0])
+      // API returns a single object for GET /meetings/:id
+      setMeeting(result)
 
     } catch (error) {
       console.error('Load meeting error:', error)

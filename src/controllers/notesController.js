@@ -26,20 +26,23 @@ const createNote = async (req, res) => {
             });
         }
 
-        // Check active participant
-        const [participants] = await db.execute(
-            `SELECT id
-             FROM meeting_participants
-             WHERE meeting_id = ?
-             AND user_id = ?
-             AND left_at IS NULL`,
-            [meetingId, userId]
-        );
+        // Check active participant or host (auto-register if host or joined)
+        if (meetings[0].host_id !== userId) {
+            const [participants] = await db.execute(
+                `SELECT id
+                 FROM meeting_participants
+                 WHERE meeting_id = ?
+                 AND user_id = ?`,
+                [meetingId, userId]
+            );
 
-        if (participants.length === 0) {
-            return res.status(403).json({
-                message: "You must join the meeting before creating notes"
-            });
+            if (participants.length === 0) {
+                await db.execute(
+                    `INSERT INTO meeting_participants (meeting_id, user_id, joined_at)
+                     VALUES (?, ?, NOW())`,
+                    [meetingId, userId]
+                );
+            }
         }
 
         const [result] = await db.execute(
@@ -96,19 +99,23 @@ const getNotes = async (req, res) => {
             });
         }
 
-        const [participants] = await db.execute(
-            `SELECT id
-             FROM meeting_participants
-             WHERE meeting_id = ?
-             AND user_id = ?
-             AND left_at IS NULL`,
-            [meetingId, userId]
-        );
+        // Allow host and any meeting participant to view notes
+        if (meetings[0].host_id !== userId) {
+            const [participants] = await db.execute(
+                `SELECT id
+                 FROM meeting_participants
+                 WHERE meeting_id = ?
+                 AND user_id = ?`,
+                [meetingId, userId]
+            );
 
-        if (participants.length === 0) {
-            return res.status(403).json({
-                message: "You must join the meeting to view notes"
-            });
+            if (participants.length === 0) {
+                await db.execute(
+                    `INSERT INTO meeting_participants (meeting_id, user_id, joined_at)
+                     VALUES (?, ?, NOW())`,
+                    [meetingId, userId]
+                );
+            }
         }
 
         const [notes] = await db.execute(

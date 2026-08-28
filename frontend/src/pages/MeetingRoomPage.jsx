@@ -164,6 +164,18 @@ useEffect(() => {
       )
     }
 
+    // Also fetch latest note from MySQL backend
+    apiRequest(`/meetings/${meeting.id}/notes`)
+      .then((res) => {
+        if (res && Array.isArray(res.notes) && res.notes.length > 0) {
+          const latest = res.notes[res.notes.length - 1]
+          if (latest && latest.content) {
+            setMeetingNote(latest.content)
+          }
+        }
+      })
+      .catch(() => {})
+
 
     /* ========================================
        POLLS
@@ -511,7 +523,7 @@ useEffect(() => {
      SAVE MEETING NOTE
   ======================================== */
 
-  const saveMeetingNote = () => {
+  const saveMeetingNote = async () => {
     if (!meeting) {
       return
     }
@@ -528,6 +540,17 @@ useEffect(() => {
       'wabiMeetingNotes',
       JSON.stringify(savedNotes)
     )
+
+    if (meetingNote && meetingNote.trim()) {
+      try {
+        await apiRequest(`/meetings/${meeting.id}/notes`, {
+          method: 'POST',
+          body: JSON.stringify({ content: meetingNote.trim() })
+        })
+      } catch (err) {
+        console.warn('Note save API sync:', err)
+      }
+    }
   }
 
 

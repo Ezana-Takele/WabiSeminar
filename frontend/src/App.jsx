@@ -11,10 +11,12 @@ import LandingPage from './pages/LandingPage'
 import LoginPage from './pages/LoginPage'
 import RegisterPage from './pages/RegisterPage'
 import Dashboard from './pages/Dashboard'
+import MeetingNotifier from './components/MeetingNotifier'
 
 function App() {
   return (
     <BrowserRouter>
+      <MeetingNotifier />
       <Routes>
 
         <Route path="/" element={<LandingPage />} />

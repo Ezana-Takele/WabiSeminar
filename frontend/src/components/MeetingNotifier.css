@@ -1,0 +1,196 @@
+/* ========================================
+   WabiSeminar - Meeting Notifier Toast
+======================================== */
+
+.wabi-notification-toast {
+  position: fixed;
+  top: 24px;
+  right: 24px;
+  z-index: 99999;
+
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+
+  max-width: 420px;
+  width: calc(100vw - 48px);
+  padding: 18px 20px;
+
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+
+  border: 1px solid rgba(139, 92, 246, 0.28);
+  border-radius: 20px;
+
+  box-shadow:
+    0 20px 45px rgba(109, 40, 217, 0.18),
+    0 4px 12px rgba(0, 0, 0, 0.05),
+    inset 0 1px 1px rgba(255, 255, 255, 0.9);
+
+  animation: slideInNotification 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+@keyframes slideInNotification {
+  from {
+    opacity: 0;
+    transform: translateY(-25px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.toast-pulse {
+  border-color: rgba(236, 72, 153, 0.45);
+  box-shadow:
+    0 0 0 0 rgba(236, 72, 153, 0.4),
+    0 20px 50px rgba(236, 72, 153, 0.22);
+  animation:
+    slideInNotification 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards,
+    toastPulseRing 2s infinite;
+}
+
+@keyframes toastPulseRing {
+  0% {
+    box-shadow:
+      0 0 0 0 rgba(236, 72, 153, 0.45),
+      0 20px 45px rgba(109, 40, 217, 0.18);
+  }
+  70% {
+    box-shadow:
+      0 0 0 14px rgba(236, 72, 153, 0),
+      0 20px 45px rgba(109, 40, 217, 0.18);
+  }
+  100% {
+    box-shadow:
+      0 0 0 0 rgba(236, 72, 153, 0),
+      0 20px 45px rgba(109, 40, 217, 0.18);
+  }
+}
+
+.toast-icon-wrap {
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 14px;
+  background: linear-gradient(135deg, #8b5cf6, #ec4899);
+  color: #ffffff;
+  font-size: 20px;
+
+  box-shadow: 0 6px 16px rgba(139, 92, 246, 0.28);
+}
+
+.toast-bell-icon {
+  display: inline-block;
+  line-height: 1;
+}
+
+.toast-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.toast-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.toast-headline {
+  font-size: 14px;
+  font-weight: 700;
+  color: #1e1b4b;
+  letter-spacing: -0.2px;
+}
+
+.toast-badge {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 8px;
+  background: rgba(139, 92, 246, 0.12);
+  color: #7c3aed;
+}
+
+.toast-message {
+  margin: 0 0 12px;
+  font-size: 13px;
+  line-height: 1.4;
+  color: #4b5563;
+  word-break: break-word;
+}
+
+.toast-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.toast-join-btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #8b5cf6, #ec4899);
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(139, 92, 246, 0.3);
+  transition: transform 0.15s ease, opacity 0.15s ease;
+}
+
+.toast-join-btn:hover {
+  opacity: 0.92;
+  transform: translateY(-1px);
+}
+
+.toast-dismiss-btn {
+  padding: 8px 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  background: transparent;
+  color: #6b7280;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.toast-dismiss-btn:hover {
+  background: rgba(0, 0, 0, 0.04);
+  color: #1f2937;
+}
+
+.toast-close-x {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  color: #9ca3af;
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  border-radius: 50%;
+  transition: color 0.15s ease, background 0.15s ease;
+}
+
+.toast-close-x:hover {
+  color: #374151;
+  background: rgba(0, 0, 0, 0.05);
+}

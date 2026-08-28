@@ -12,16 +12,16 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Ezana-Takele/WabiSeminar.git"
+    "url": "git+https://github.com/TnebebZewdu/WabiSeminar.git"
   },
   "keywords": [],
   "author": "Ezana Takele",
   "license": "ISC",
   "type": "commonjs",
   "bugs": {
-    "url": "https://github.com/Ezana-Takele/WabiSeminar/issues"
+    "url": "https://github.com/TnebebZewdu/WabiSeminar/issues"
   },
-  "homepage": "https://github.com/Ezana-Takele/WabiSeminar#readme",
+  "homepage": "https://github.com/TnebebZewdu/WabiSeminar#readme",
   "devDependencies": {
     "nodemon": "^3.1.14"
   },

@@ -1,5 +1,5 @@
-import { useEffect, useState, useRef } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { apiRequest } from '../services/api'
 import './MeetingNotifier.css'
 
@@ -32,14 +32,41 @@ function parseMeetingDateTime(dateStr, timeStr) {
   return isNaN(fallback.getTime()) ? null : fallback
 }
 
+function getDismissedSet() {
+  try {
+    const raw = sessionStorage.getItem('wabi_dismissed_notifications')
+    return raw ? new Set(JSON.parse(raw)) : new Set()
+  } catch {
+    return new Set()
+  }
+}
+
+function saveDismissedKey(key) {
+  try {
+    const set = getDismissedSet()
+    set.add(key)
+    sessionStorage.setItem('wabi_dismissed_notifications', JSON.stringify([...set]))
+  } catch {}
+}
+
 export default function MeetingNotifier() {
   const navigate = useNavigate()
+  const location = useLocation()
   const [activeNotification, setActiveNotification] = useState(null)
-  const dismissedRef = useRef(new Set())
 
-  // Request browser notification permission once on mount
+  // Public unauthenticated routes where notification should NEVER show
+  const isPublicRoute =
+    location.pathname === '/' ||
+    location.pathname === '/login' ||
+    location.pathname === '/register'
+
+  // Don't notify if already inside a meeting room
+  const isInsideMeetingRoom = location.pathname.startsWith('/meeting-room/')
+
   useEffect(() => {
-    if (typeof window !== 'undefined' && 'Notification' in window) {
+    // Only request browser permission when logged in
+    const token = localStorage.getItem('token')
+    if (token && typeof window !== 'undefined' && 'Notification' in window) {
       if (Notification.permission === 'default') {
         Notification.requestPermission().catch(() => {})
       }
@@ -47,17 +74,35 @@ export default function MeetingNotifier() {
   }, [])
 
   useEffect(() => {
+    // If public route or not logged in, clear and exit
+    const token = localStorage.getItem('token')
+    if (isPublicRoute || !token) {
+      setActiveNotification(null)
+      return
+    }
+
     const checkScheduledMeetings = async () => {
       try {
-        const token = localStorage.getItem('token')
-        if (!token) return
+        const currentToken = localStorage.getItem('token')
+        if (!currentToken) {
+          setActiveNotification(null)
+          return
+        }
 
         const result = await apiRequest('/meetings')
         const meetings = Array.isArray(result) ? result : result.meetings || []
         const now = new Date()
+        const dismissed = getDismissedSet()
+
+        // Get currently active meeting room ID if user is in one
+        const currentMeetingRoomId = isInsideMeetingRoom
+          ? location.pathname.split('/meeting-room/')[1]
+          : null
 
         for (const m of meetings) {
           if (m.completed) continue
+          // Skip if user is currently inside this meeting room
+          if (currentMeetingRoomId && String(m.id) === String(currentMeetingRoomId)) continue
 
           const meetingTime = parseMeetingDateTime(m.date, m.time)
           if (!meetingTime) continue
@@ -65,12 +110,11 @@ export default function MeetingNotifier() {
           const diffMs = meetingTime.getTime() - now.getTime()
           const diffMinutes = Math.round(diffMs / (1000 * 60))
 
-          // Key for tracking dismissed state per notification tier
           const nowKey = `${m.id}_started`
           const upcomingKey = `${m.id}_10min`
 
-          // 1. Meeting Starting Right Now (or started within last 20 min)
-          if (diffMinutes <= 0 && diffMinutes >= -20 && !dismissedRef.current.has(nowKey)) {
+          // 1. Meeting Starting Right Now (within last 5 min to next 1 min)
+          if (diffMinutes <= 0 && diffMinutes >= -5 && !dismissed.has(nowKey)) {
             setActiveNotification({
               id: m.id,
               type: 'starting_now',
@@ -81,7 +125,6 @@ export default function MeetingNotifier() {
               key: nowKey,
             })
 
-            // Trigger system browser notification
             if (typeof window !== 'undefined' && 'Notification' in window && Notification.permission === 'granted') {
               new Notification('🔔 WabiSeminar: Meeting Starting Now!', {
                 body: `"${m.title}" is ready. Click to join the seminar session.`,
@@ -91,8 +134,8 @@ export default function MeetingNotifier() {
             break
           }
 
-          // 2. Upcoming Reminder (within 10 minutes)
-          if (diffMinutes > 0 && diffMinutes <= 10 && !dismissedRef.current.has(upcomingKey)) {
+          // 2. Upcoming Reminder (between 1 and 10 minutes before)
+          if (diffMinutes > 0 && diffMinutes <= 10 && !dismissed.has(upcomingKey)) {
             setActiveNotification({
               id: m.id,
               type: 'upcoming_soon',
@@ -114,32 +157,33 @@ export default function MeetingNotifier() {
           }
         }
       } catch (err) {
-        // Silently skip if network/auth not ready
+        // Silently skip
       }
     }
 
     checkScheduledMeetings()
-    const interval = setInterval(checkScheduledMeetings, 10000)
+    const interval = setInterval(checkScheduledMeetings, 15000)
     return () => clearInterval(interval)
-  }, [])
+  }, [location.pathname, isPublicRoute, isInsideMeetingRoom])
 
   const handleDismiss = () => {
     if (activeNotification) {
-      dismissedRef.current.add(activeNotification.key)
+      saveDismissedKey(activeNotification.key)
       setActiveNotification(null)
     }
   }
 
   const handleJoin = () => {
     if (activeNotification) {
-      dismissedRef.current.add(activeNotification.key)
+      saveDismissedKey(activeNotification.key)
       const mId = activeNotification.id
       setActiveNotification(null)
       navigate(`/meeting-room/${mId}`)
     }
   }
 
-  if (!activeNotification) return null
+  // Never render on public pages, without active notification, or inside the meeting room
+  if (isPublicRoute || !activeNotification || isInsideMeetingRoom) return null
 
   const isStarting = activeNotification.type === 'starting_now'
 

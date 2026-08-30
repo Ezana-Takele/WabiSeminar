@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { NavLink, useNavigate, useParams } from 'react-router-dom'
 import { apiRequest } from '../services/api'
 import '../App.css'
@@ -7,8 +7,18 @@ function MeetingRoomPage() {
   const { meetingId } = useParams()
   const navigate = useNavigate()
 
+  /* ========================================
+     CAMERA / MICROPHONE
+  ======================================== */
+
+  const videoRef = useRef(null)
+  const streamRef = useRef(null)
+
   const [micOn, setMicOn] = useState(true)
   const [cameraOn, setCameraOn] = useState(true)
+
+  const [cameraError, setCameraError] = useState('')
+
   const [sharing, setSharing] = useState(false)
   const [handRaised, setHandRaised] = useState(false)
 
@@ -20,7 +30,6 @@ function MeetingRoomPage() {
   const [participants, setParticipants] = useState([])
 
   const [meeting, setMeeting] = useState(null)
-  
 
   /* ========================================
      MEETING TOOLS
@@ -50,52 +59,229 @@ function MeetingRoomPage() {
 
 
   /* ========================================
+     START CAMERA
+  ======================================== */
+
+  const startCamera = async () => {
+    try {
+      setCameraError('')
+
+      if (!navigator.mediaDevices?.getUserMedia) {
+        setCameraError(
+          'Camera access is not supported by this browser.'
+        )
+        setCameraOn(false)
+        return
+      }
+
+      const stream =
+        await navigator.mediaDevices.getUserMedia({
+          video: true,
+          audio: true,
+        })
+
+      streamRef.current = stream
+
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream
+
+        try {
+          await videoRef.current.play()
+        } catch (error) {
+          console.warn(
+            'Video autoplay warning:',
+            error
+          )
+        }
+      }
+
+      const videoTrack =
+        stream.getVideoTracks()[0]
+
+      const audioTrack =
+        stream.getAudioTracks()[0]
+
+      if (videoTrack) {
+        videoTrack.enabled = true
+      }
+
+      if (audioTrack) {
+        audioTrack.enabled = true
+      }
+
+      setCameraOn(true)
+      setMicOn(true)
+
+    } catch (error) {
+      console.error(
+        'Camera/microphone access error:',
+        error
+      )
+
+      setCameraError(
+        'Camera access was blocked. Please allow camera permission in your browser.'
+      )
+
+      setCameraOn(false)
+      setMicOn(false)
+    }
+  }
+
+
+  /* ========================================
+     CAMERA INITIALIZATION
+  ======================================== */
+
+  useEffect(() => {
+    startCamera()
+
+    return () => {
+      if (streamRef.current) {
+        streamRef.current
+          .getTracks()
+          .forEach((track) => {
+            track.stop()
+          })
+
+        streamRef.current = null
+      }
+    }
+  }, [])
+
+
+  /* ========================================
+     KEEP VIDEO ELEMENT CONNECTED TO STREAM
+  ======================================== */
+
+  useEffect(() => {
+    if (
+      videoRef.current &&
+      streamRef.current &&
+      videoRef.current.srcObject !==
+        streamRef.current
+    ) {
+      videoRef.current.srcObject =
+        streamRef.current
+
+      videoRef.current.play().catch(() => {})
+    }
+  }, [cameraOn])
+
+
+  /* ========================================
+     TOGGLE CAMERA
+  ======================================== */
+
+  const toggleCamera = async () => {
+    if (!streamRef.current) {
+      await startCamera()
+      return
+    }
+
+    const videoTracks =
+      streamRef.current.getVideoTracks()
+
+    if (videoTracks.length === 0) {
+      await startCamera()
+      return
+    }
+
+    const newCameraState = !cameraOn
+
+    videoTracks.forEach((track) => {
+      track.enabled = newCameraState
+    })
+
+    setCameraOn(newCameraState)
+  }
+
+
+  /* ========================================
+     TOGGLE MICROPHONE
+  ======================================== */
+
+  const toggleMicrophone = async () => {
+    if (!streamRef.current) {
+      await startCamera()
+      return
+    }
+
+    const audioTracks =
+      streamRef.current.getAudioTracks()
+
+    if (audioTracks.length === 0) {
+      await startCamera()
+      return
+    }
+
+    const newMicState = !micOn
+
+    audioTracks.forEach((track) => {
+      track.enabled = newMicState
+    })
+
+    setMicOn(newMicState)
+  }
+
+
+  /* ========================================
      LOAD MEETING
   ======================================== */
 
   useEffect(() => {
-  const loadMeeting = async () => {
-    try {
-      const result = await apiRequest(
-        `/meetings/${meetingId}`
-      )
+    const loadMeeting = async () => {
+      try {
+        const result = await apiRequest(
+          `/meetings/${meetingId}`
+        )
 
-      if (!result) {
+        if (!result) {
+          setMeeting(null)
+          return
+        }
+
+        setMeeting(result)
+
+      } catch (error) {
+        console.error(
+          'Load meeting error:',
+          error
+        )
+
         setMeeting(null)
-        return
       }
-
-      // API returns a single object for GET /meetings/:id
-      setMeeting(result)
-
-    } catch (error) {
-      console.error('Load meeting error:', error)
-      setMeeting(null)
     }
-  }
 
-  loadMeeting()
-}, [meetingId])
+    loadMeeting()
+  }, [meetingId])
 
-useEffect(() => {
-  const loadParticipants = async () => {
-    try {
-      const result = await apiRequest(
-        `/meetings/${meetingId}/participants`
-      )
 
-      setParticipants(result.participants || [])
+  /* ========================================
+     LOAD PARTICIPANTS
+  ======================================== */
 
-    } catch (error) {
-      console.error(
-        'Load participants error:',
-        error
-      )
+  useEffect(() => {
+    const loadParticipants = async () => {
+      try {
+        const result = await apiRequest(
+          `/meetings/${meetingId}/participants`
+        )
+
+        setParticipants(
+          result?.participants || []
+        )
+
+      } catch (error) {
+        console.error(
+          'Load participants error:',
+          error
+        )
+      }
     }
-  }
 
-  loadParticipants()
-}, [meetingId])
+    loadParticipants()
+  }, [meetingId])
+
 
   /* ========================================
      LOAD MEETING DATA
@@ -105,6 +291,7 @@ useEffect(() => {
     if (!meeting) {
       return
     }
+
 
     /* ========================================
        CHAT
@@ -139,14 +326,10 @@ useEffect(() => {
 
     const savedNotes =
       JSON.parse(
-        localStorage.getItem('wabiMeetingNotes')
+        localStorage.getItem(
+          'wabiMeetingNotes'
+        )
       ) || {}
-
-    /*
-      Load the note belonging to THIS meeting.
-      If there is no saved note, use the note
-      stored directly on the meeting if available.
-    */
 
     const savedNote =
       savedNotes[meeting.id]
@@ -164,13 +347,28 @@ useEffect(() => {
       )
     }
 
-    // Also fetch latest note from MySQL backend
-    apiRequest(`/meetings/${meeting.id}/notes`)
+
+    apiRequest(
+      `/meetings/${meeting.id}/notes`
+    )
       .then((res) => {
-        if (res && Array.isArray(res.notes) && res.notes.length > 0) {
-          const latest = res.notes[res.notes.length - 1]
-          if (latest && latest.content) {
-            setMeetingNote(latest.content)
+        if (
+          res &&
+          Array.isArray(res.notes) &&
+          res.notes.length > 0
+        ) {
+          const latest =
+            res.notes[
+              res.notes.length - 1
+            ]
+
+          if (
+            latest &&
+            latest.content
+          ) {
+            setMeetingNote(
+              latest.content
+            )
           }
         }
       })
@@ -183,7 +381,9 @@ useEffect(() => {
 
     const savedPolls =
       JSON.parse(
-        localStorage.getItem('wabiMeetingPolls')
+        localStorage.getItem(
+          'wabiMeetingPolls'
+        )
       ) || {}
 
     setPolls(
@@ -197,7 +397,9 @@ useEffect(() => {
 
     const savedFiles =
       JSON.parse(
-        localStorage.getItem('wabiMeetingFiles')
+        localStorage.getItem(
+          'wabiMeetingFiles'
+        )
       ) || {}
 
     setMeetingFiles(
@@ -211,7 +413,9 @@ useEffect(() => {
 
     const savedAgenda =
       JSON.parse(
-        localStorage.getItem('wabiMeetingAgenda')
+        localStorage.getItem(
+          'wabiMeetingAgenda'
+        )
       ) || {}
 
     setAgendaItems(
@@ -230,18 +434,11 @@ useEffect(() => {
       return
     }
 
-    /*
-      Save notes automatically whenever the
-      note changes.
-
-      This fixes the problem where the note
-      disappears after leaving and re-entering
-      the meeting.
-    */
-
     const savedNotes =
       JSON.parse(
-        localStorage.getItem('wabiMeetingNotes')
+        localStorage.getItem(
+          'wabiMeetingNotes'
+        )
       ) || {}
 
     savedNotes[meeting.id] =
@@ -259,7 +456,9 @@ useEffect(() => {
      SAVE MEETING CHAT
   ======================================== */
 
-  const saveMeetingChat = (finalMessages) => {
+  const saveMeetingChat = (
+    finalMessages
+  ) => {
     if (!meeting) {
       return
     }
@@ -278,7 +477,6 @@ useEffect(() => {
 
     const chatData = {
       id: meeting.id,
-
       meetingId: meeting.id,
 
       name:
@@ -307,11 +505,13 @@ useEffect(() => {
           ? lastMessage.time
           : '',
 
-      messages: finalMessages,
+      messages:
+        finalMessages,
 
       savedAt:
         new Date().toISOString(),
     }
+
 
     const existingIndex =
       savedChats.findIndex(
@@ -320,9 +520,12 @@ useEffect(() => {
           String(meeting.id)
       )
 
+
     let updatedChats
 
+
     if (existingIndex !== -1) {
+
       updatedChats =
         savedChats.map(
           (chat, index) =>
@@ -330,12 +533,16 @@ useEffect(() => {
               ? chatData
               : chat
         )
+
     } else {
+
       updatedChats = [
         ...savedChats,
         chatData,
       ]
+
     }
+
 
     localStorage.setItem(
       'wabiChats',
@@ -349,19 +556,30 @@ useEffect(() => {
   ======================================== */
 
   const handleLeaveMeeting = () => {
+
+    if (streamRef.current) {
+      streamRef.current
+        .getTracks()
+        .forEach((track) => {
+          track.stop()
+        })
+
+      streamRef.current = null
+    }
+
     if (!meeting) {
       navigate('/meetings')
       return
     }
 
-    /*
-      Make sure the latest note is saved before
-      leaving the meeting.
-    */
+
+    /* SAVE NOTE */
 
     const savedNotes =
       JSON.parse(
-        localStorage.getItem('wabiMeetingNotes')
+        localStorage.getItem(
+          'wabiMeetingNotes'
+        )
       ) || {}
 
     savedNotes[meeting.id] =
@@ -372,43 +590,80 @@ useEffect(() => {
       JSON.stringify(savedNotes)
     )
 
+
+    /* SAVE CHAT */
+
     saveMeetingChat(messages)
 
-    const meetings =
+
+    /* SAVE COMPLETED MEETING */
+
+    const savedMeetings =
       JSON.parse(
-        localStorage.getItem('wabiMeetings')
+        localStorage.getItem(
+          'wabiMeetings'
+        )
       ) || []
 
-    const updatedMeetings =
-      meetings.map((item) => {
-        if (
+
+    const completedMeeting = {
+      ...meeting,
+
+      completed: true,
+
+      joined: true,
+
+      completedAt:
+        new Date().toISOString(),
+
+      messages: messages,
+
+      meetingNote:
+        meetingNote,
+    }
+
+
+    const existingIndex =
+      savedMeetings.findIndex(
+        (item) =>
           String(item.id) ===
-          String(meetingId)
-        ) {
-          return {
-            ...item,
+          String(meeting.id)
+      )
 
-            completed: true,
 
-            joined: true,
+    let updatedMeetings
 
-            completedAt:
-              new Date().toISOString(),
 
-            messages,
+    if (existingIndex !== -1) {
 
-            meetingNote:
-              meetingNote,
-          }
-        }
+      updatedMeetings =
+        savedMeetings.map(
+          (item, index) =>
+            index === existingIndex
+              ? {
+                  ...item,
+                  ...completedMeeting,
+                }
+              : item
+        )
 
-        return item
-      })
+    } else {
+
+      updatedMeetings = [
+        ...savedMeetings,
+        completedMeeting,
+      ]
+
+    }
+
 
     localStorage.setItem(
       'wabiMeetings',
-      JSON.stringify(updatedMeetings)
+      JSON.stringify(
+        updatedMeetings
+      )
     )
+
 
     navigate('/meetings')
   }
@@ -424,9 +679,13 @@ useEffect(() => {
     const cleanMessage =
       message.trim()
 
-    if (!cleanMessage || !meeting) {
+    if (
+      !cleanMessage ||
+      !meeting
+    ) {
       return
     }
+
 
     const newMessage = {
       id: Date.now(),
@@ -447,39 +706,57 @@ useEffect(() => {
         ),
     }
 
+
     const updatedMessages = [
       ...messages,
       newMessage,
     ]
 
-    setMessages(updatedMessages)
 
-    saveMeetingChat(updatedMessages)
+    setMessages(
+      updatedMessages
+    )
+
+    saveMeetingChat(
+      updatedMessages
+    )
+
 
     const meetings =
       JSON.parse(
-        localStorage.getItem('wabiMeetings')
+        localStorage.getItem(
+          'wabiMeetings'
+        )
       ) || []
 
-    const updatedMeetings =
-      meetings.map((item) => {
-        if (
-          String(item.id) ===
-          String(meeting.id)
-        ) {
-          return {
-            ...item,
-            messages: updatedMessages,
-          }
-        }
 
-        return item
-      })
+    const updatedMeetings =
+      meetings.map(
+        (item) => {
+
+          if (
+            String(item.id) ===
+            String(meeting.id)
+          ) {
+            return {
+              ...item,
+              messages:
+                updatedMessages,
+            }
+          }
+
+          return item
+        }
+      )
+
 
     localStorage.setItem(
       'wabiMeetings',
-      JSON.stringify(updatedMeetings)
+      JSON.stringify(
+        updatedMeetings
+      )
     )
+
 
     setMessage('')
   }
@@ -489,7 +766,9 @@ useEffect(() => {
      REACTION
   ======================================== */
 
-  const handleReaction = (emoji) => {
+  const handleReaction = (
+    emoji
+  ) => {
     setShowReactionMenu(false)
 
     setReaction(emoji)
@@ -504,7 +783,9 @@ useEffect(() => {
      OPEN TOOL
   ======================================== */
 
-  const openTool = (tool) => {
+  const openTool = (
+    tool
+  ) => {
     setActiveTool(tool)
     setShowReactionMenu(false)
   }
@@ -528,27 +809,50 @@ useEffect(() => {
       return
     }
 
+
     const savedNotes =
       JSON.parse(
-        localStorage.getItem('wabiMeetingNotes')
+        localStorage.getItem(
+          'wabiMeetingNotes'
+        )
       ) || {}
+
 
     savedNotes[meeting.id] =
       meetingNote
+
 
     localStorage.setItem(
       'wabiMeetingNotes',
       JSON.stringify(savedNotes)
     )
 
-    if (meetingNote && meetingNote.trim()) {
+
+    if (
+      meetingNote &&
+      meetingNote.trim()
+    ) {
       try {
-        await apiRequest(`/meetings/${meeting.id}/notes`, {
-          method: 'POST',
-          body: JSON.stringify({ content: meetingNote.trim() })
-        })
+
+        await apiRequest(
+          `/meetings/${meeting.id}/notes`,
+          {
+            method: 'POST',
+
+            body: JSON.stringify({
+              content:
+                meetingNote.trim(),
+            }),
+          }
+        )
+
       } catch (err) {
-        console.warn('Note save API sync:', err)
+
+        console.warn(
+          'Note save API sync:',
+          err
+        )
+
       }
     }
   }
@@ -570,6 +874,7 @@ useEffect(() => {
     const optionTwo =
       pollOptionTwo.trim()
 
+
     if (
       !question ||
       !optionOne ||
@@ -578,6 +883,7 @@ useEffect(() => {
     ) {
       return
     }
+
 
     const newPoll = {
       id: Date.now(),
@@ -590,6 +896,7 @@ useEffect(() => {
           text: optionOne,
           votes: 0,
         },
+
         {
           id: 2,
           text: optionTwo,
@@ -603,25 +910,35 @@ useEffect(() => {
       voted: false,
     }
 
+
     const updatedPolls = [
       newPoll,
       ...polls,
     ]
 
-    setPolls(updatedPolls)
+
+    setPolls(
+      updatedPolls
+    )
+
 
     const savedPolls =
       JSON.parse(
-        localStorage.getItem('wabiMeetingPolls')
+        localStorage.getItem(
+          'wabiMeetingPolls'
+        )
       ) || {}
+
 
     savedPolls[meeting.id] =
       updatedPolls
+
 
     localStorage.setItem(
       'wabiMeetingPolls',
       JSON.stringify(savedPolls)
     )
+
 
     setPollQuestion('')
     setPollOptionOne('')
@@ -633,48 +950,66 @@ useEffect(() => {
      VOTE ON POLL
   ======================================== */
 
-  const votePoll = (pollId, optionId) => {
+  const votePoll = (
+    pollId,
+    optionId
+  ) => {
     if (!meeting) {
       return
     }
 
+
     const updatedPolls =
-      polls.map((poll) => {
-        if (
-          poll.id !== pollId ||
-          poll.voted
-        ) {
-          return poll
+      polls.map(
+        (poll) => {
+
+          if (
+            poll.id !== pollId ||
+            poll.voted
+          ) {
+            return poll
+          }
+
+
+          return {
+            ...poll,
+
+            voted: true,
+
+            options:
+              poll.options.map(
+                (option) =>
+                  option.id ===
+                  optionId
+                    ? {
+                        ...option,
+                        votes:
+                          option.votes +
+                          1,
+                      }
+                    : option
+              ),
+          }
         }
+      )
 
-        return {
-          ...poll,
 
-          voted: true,
+    setPolls(
+      updatedPolls
+    )
 
-          options:
-            poll.options.map(
-              (option) =>
-                option.id === optionId
-                  ? {
-                      ...option,
-                      votes:
-                        option.votes + 1,
-                    }
-                  : option
-            ),
-        }
-      })
-
-    setPolls(updatedPolls)
 
     const savedPolls =
       JSON.parse(
-        localStorage.getItem('wabiMeetingPolls')
+        localStorage.getItem(
+          'wabiMeetingPolls'
+        )
       ) || {}
+
 
     savedPolls[meeting.id] =
       updatedPolls
+
 
     localStorage.setItem(
       'wabiMeetingPolls',
@@ -693,9 +1028,13 @@ useEffect(() => {
     const cleanText =
       agendaText.trim()
 
-    if (!cleanText || !meeting) {
+    if (
+      !cleanText ||
+      !meeting
+    ) {
       return
     }
+
 
     const newItem = {
       id: Date.now(),
@@ -705,25 +1044,35 @@ useEffect(() => {
       completed: false,
     }
 
+
     const updatedAgenda = [
       ...agendaItems,
       newItem,
     ]
 
-    setAgendaItems(updatedAgenda)
+
+    setAgendaItems(
+      updatedAgenda
+    )
+
 
     const savedAgenda =
       JSON.parse(
-        localStorage.getItem('wabiMeetingAgenda')
+        localStorage.getItem(
+          'wabiMeetingAgenda'
+        )
       ) || {}
+
 
     savedAgenda[meeting.id] =
       updatedAgenda
+
 
     localStorage.setItem(
       'wabiMeetingAgenda',
       JSON.stringify(savedAgenda)
     )
+
 
     setAgendaText('')
   }
@@ -733,31 +1082,43 @@ useEffect(() => {
      TOGGLE AGENDA ITEM
   ======================================== */
 
-  const toggleAgendaItem = (itemId) => {
+  const toggleAgendaItem = (
+    itemId
+  ) => {
     if (!meeting) {
       return
     }
 
+
     const updatedAgenda =
-      agendaItems.map((item) =>
-        item.id === itemId
-          ? {
-              ...item,
-              completed:
-                !item.completed,
-            }
-          : item
+      agendaItems.map(
+        (item) =>
+          item.id === itemId
+            ? {
+                ...item,
+                completed:
+                  !item.completed,
+              }
+            : item
       )
 
-    setAgendaItems(updatedAgenda)
+
+    setAgendaItems(
+      updatedAgenda
+    )
+
 
     const savedAgenda =
       JSON.parse(
-        localStorage.getItem('wabiMeetingAgenda')
+        localStorage.getItem(
+          'wabiMeetingAgenda'
+        )
       ) || {}
+
 
     savedAgenda[meeting.id] =
       updatedAgenda
+
 
     localStorage.setItem(
       'wabiMeetingAgenda',
@@ -770,10 +1131,13 @@ useEffect(() => {
      REMOVE AGENDA ITEM
   ======================================== */
 
-  const removeAgendaItem = (itemId) => {
+  const removeAgendaItem = (
+    itemId
+  ) => {
     if (!meeting) {
       return
     }
+
 
     const updatedAgenda =
       agendaItems.filter(
@@ -781,15 +1145,23 @@ useEffect(() => {
           item.id !== itemId
       )
 
-    setAgendaItems(updatedAgenda)
+
+    setAgendaItems(
+      updatedAgenda
+    )
+
 
     const savedAgenda =
       JSON.parse(
-        localStorage.getItem('wabiMeetingAgenda')
+        localStorage.getItem(
+          'wabiMeetingAgenda'
+        )
       ) || {}
+
 
     savedAgenda[meeting.id] =
       updatedAgenda
+
 
     localStorage.setItem(
       'wabiMeetingAgenda',
@@ -802,11 +1174,14 @@ useEffect(() => {
      ADD FILE
   ======================================== */
 
-  const handleFileSelect = (e) => {
+  const handleFileSelect = (
+    e
+  ) => {
     const selectedFiles =
       Array.from(
         e.target.files || []
       )
+
 
     if (
       selectedFiles.length === 0 ||
@@ -815,41 +1190,58 @@ useEffect(() => {
       return
     }
 
+
     const newFiles =
-      selectedFiles.map((file) => ({
-        id: Date.now() + Math.random(),
+      selectedFiles.map(
+        (file) => ({
+          id:
+            Date.now() +
+            Math.random(),
 
-        name: file.name,
+          name:
+            file.name,
 
-        size: file.size,
+          size:
+            file.size,
 
-        type:
-          file.type ||
-          'Unknown file',
+          type:
+            file.type ||
+            'Unknown file',
 
-        addedAt:
-          new Date().toISOString(),
-      }))
+          addedAt:
+            new Date().toISOString(),
+        })
+      )
+
 
     const updatedFiles = [
       ...meetingFiles,
       ...newFiles,
     ]
 
-    setMeetingFiles(updatedFiles)
+
+    setMeetingFiles(
+      updatedFiles
+    )
+
 
     const savedFiles =
       JSON.parse(
-        localStorage.getItem('wabiMeetingFiles')
+        localStorage.getItem(
+          'wabiMeetingFiles'
+        )
       ) || {}
+
 
     savedFiles[meeting.id] =
       updatedFiles
+
 
     localStorage.setItem(
       'wabiMeetingFiles',
       JSON.stringify(savedFiles)
     )
+
 
     e.target.value = ''
   }
@@ -859,10 +1251,13 @@ useEffect(() => {
      REMOVE FILE
   ======================================== */
 
-  const removeFile = (fileId) => {
+  const removeFile = (
+    fileId
+  ) => {
     if (!meeting) {
       return
     }
+
 
     const updatedFiles =
       meetingFiles.filter(
@@ -870,15 +1265,23 @@ useEffect(() => {
           file.id !== fileId
       )
 
-    setMeetingFiles(updatedFiles)
+
+    setMeetingFiles(
+      updatedFiles
+    )
+
 
     const savedFiles =
       JSON.parse(
-        localStorage.getItem('wabiMeetingFiles')
+        localStorage.getItem(
+          'wabiMeetingFiles'
+        )
       ) || {}
+
 
     savedFiles[meeting.id] =
       updatedFiles
+
 
     localStorage.setItem(
       'wabiMeetingFiles',
@@ -891,20 +1294,28 @@ useEffect(() => {
      FORMAT FILE SIZE
   ======================================== */
 
-  const formatFileSize = (bytes) => {
+  const formatFileSize = (
+    bytes
+  ) => {
     if (!bytes) {
       return '0 KB'
     }
+
 
     if (bytes < 1024) {
       return `${bytes} B`
     }
 
-    if (bytes < 1024 * 1024) {
+
+    if (
+      bytes <
+      1024 * 1024
+    ) {
       return `${Math.round(
         bytes / 1024
       )} KB`
     }
+
 
     return `${(
       bytes /
@@ -917,10 +1328,13 @@ useEffect(() => {
      FORMAT DATE
   ======================================== */
 
-  const formatDate = (date) => {
+  const formatDate = (
+    date
+  ) => {
     if (!date) {
       return ''
     }
+
 
     return new Date(
       date
@@ -946,8 +1360,11 @@ useEffect(() => {
         <header className="meeting-room-header">
 
           <div className="meeting-room-brand">
-            <h2>WabiSeminar</h2>
+            <h2>
+              WabiSeminar
+            </h2>
           </div>
+
 
           <div className="meeting-room-title">
 
@@ -961,6 +1378,7 @@ useEffect(() => {
 
           </div>
 
+
           <NavLink
             to="/meetings"
             className="meeting-room-exit"
@@ -969,6 +1387,7 @@ useEffect(() => {
           </NavLink>
 
         </header>
+
 
         <main className="meeting-not-found">
 
@@ -987,6 +1406,7 @@ useEffect(() => {
               deleted or the meeting link
               is invalid.
             </p>
+
 
             <NavLink
               to="/meetings"
@@ -1014,8 +1434,13 @@ useEffect(() => {
       <header className="meeting-room-header">
 
         <div className="meeting-room-brand">
-          <h2>WabiSeminar</h2>
+
+          <h2>
+            WabiSeminar
+          </h2>
+
         </div>
+
 
         <div className="meeting-room-title">
 
@@ -1028,6 +1453,7 @@ useEffect(() => {
           </span>
 
         </div>
+
 
         <button
           type="button"
@@ -1066,6 +1492,7 @@ useEffect(() => {
               </h3>
 
             </div>
+
 
             <span className="live-indicator">
               LIVE
@@ -1152,7 +1579,12 @@ useEffect(() => {
                 </span>
 
                 <strong>
-                  1 participant
+                  {participants.length ||
+                    1}{' '}
+                  participant
+                  {participants.length > 1
+                    ? 's'
+                    : ''}
                 </strong>
 
               </div>
@@ -1191,6 +1623,7 @@ useEffect(() => {
               Meeting tools
             </div>
 
+
             <div className="meeting-tools-list">
 
               <button
@@ -1211,6 +1644,7 @@ useEffect(() => {
                 <span>
                   Notes
                 </span>
+
               </button>
 
 
@@ -1232,6 +1666,7 @@ useEffect(() => {
                 <span>
                   Polls
                 </span>
+
               </button>
 
 
@@ -1253,6 +1688,7 @@ useEffect(() => {
                 <span>
                   Files
                 </span>
+
               </button>
 
 
@@ -1274,6 +1710,7 @@ useEffect(() => {
                 <span>
                   Agenda
                 </span>
+
               </button>
 
             </div>
@@ -1298,21 +1735,33 @@ useEffect(() => {
 
               {cameraOn ? (
 
-                <div className="camera-placeholder">
+                <>
+                  <video
+                    ref={videoRef}
+                    className="camera-video"
+                    autoPlay
+                    muted
+                    playsInline
+                  />
 
-                  <div className="camera-avatar">
-                    TZ
+                  <div className="video-name">
+                    You
                   </div>
 
-                  <span>
-                    Your camera preview
-                  </span>
-
-                </div>
+                  <div className="video-mic">
+                    {micOn
+                      ? '🎤'
+                      : '🔇'}
+                  </div>
+                </>
 
               ) : (
 
                 <div className="camera-off">
+
+                  <div className="camera-avatar">
+                    TZ
+                  </div>
 
                   <div className="camera-off-icon">
                     📹
@@ -1326,15 +1775,14 @@ useEffect(() => {
 
               )}
 
-              <div className="video-name">
-                You
-              </div>
 
-              <div className="video-mic">
-                {micOn
-                  ? '🎤'
-                  : '🔇'}
-              </div>
+              {cameraError && !cameraOn && (
+
+                <div className="camera-error-message">
+                  {cameraError}
+                </div>
+
+              )}
 
             </div>
 
@@ -1372,6 +1820,8 @@ useEffect(() => {
           <div className="meeting-center-controls">
 
 
+            {/* MICROPHONE */}
+
             <button
               type="button"
               className={`meeting-control ${
@@ -1379,9 +1829,7 @@ useEffect(() => {
                   ? 'control-off'
                   : ''
               }`}
-              onClick={() =>
-                setMicOn(!micOn)
-              }
+              onClick={toggleMicrophone}
               title={
                 micOn
                   ? 'Mute microphone'
@@ -1404,6 +1852,8 @@ useEffect(() => {
             </button>
 
 
+            {/* CAMERA */}
+
             <button
               type="button"
               className={`meeting-control ${
@@ -1411,9 +1861,7 @@ useEffect(() => {
                   ? 'control-off'
                   : ''
               }`}
-              onClick={() =>
-                setCameraOn(!cameraOn)
-              }
+              onClick={toggleCamera}
               title={
                 cameraOn
                   ? 'Turn camera off'
@@ -1435,6 +1883,8 @@ useEffect(() => {
 
             </button>
 
+
+            {/* SHARE */}
 
             <button
               type="button"
@@ -1461,6 +1911,8 @@ useEffect(() => {
 
             </button>
 
+
+            {/* HAND */}
 
             <button
               type="button"
@@ -1489,6 +1941,8 @@ useEffect(() => {
 
             </button>
 
+
+            {/* REACTIONS */}
 
             <div className="reaction-control">
 
@@ -1597,13 +2051,18 @@ useEffect(() => {
                 </h3>
 
                 <span>
-                  1 participant
+                  {participants.length || 1}{' '}
+                  participant
+                  {participants.length > 1
+                    ? 's'
+                    : ''}
                 </span>
 
               </div>
 
+
               <span className="participant-count">
-                1
+                {participants.length || 1}
               </span>
 
             </div>
@@ -1667,9 +2126,7 @@ useEffect(() => {
           </section>
 
 
-          {/* ========================================
-              CHAT
-          ======================================== */}
+          {/* CHAT */}
 
           <section className="right-chat-panel">
 
@@ -1694,6 +2151,7 @@ useEffect(() => {
                 </div>
 
               </div>
+
 
               <span className="chat-online-dot">
                 ●
@@ -1725,77 +2183,79 @@ useEffect(() => {
 
               ) : (
 
-                messages.map((item) => {
+                messages.map(
+                  (item) => {
 
-                  const isYou =
-                    item.sender === 'You'
+                    const isYou =
+                      item.sender === 'You'
 
-                  return (
 
-                    <div
-                      className={`chat-message-row ${
-                        isYou
-                          ? 'chat-message-you'
-                          : 'chat-message-other'
-                      }`}
-                      key={item.id}
-                    >
+                    return (
 
-                      {!isYou && (
+                      <div
+                        className={`chat-message-row ${
+                          isYou
+                            ? 'chat-message-you'
+                            : 'chat-message-other'
+                        }`}
+                        key={item.id}
+                      >
 
-                        <div className="chat-message-avatar">
+                        {!isYou && (
 
-                          {selectedInitials(
-                            item,
-                            meeting
-                          )}
+                          <div className="chat-message-avatar">
+
+                            {selectedInitials(
+                              item,
+                              meeting
+                            )}
+
+                          </div>
+
+                        )}
+
+
+                        <div className="chat-message-wrapper">
+
+                          <div className="chat-message-meta">
+
+                            <strong>
+                              {isYou
+                                ? 'You'
+                                : item.sender}
+                            </strong>
+
+                            {item.time && (
+
+                              <span>
+                                {item.time}
+                              </span>
+
+                            )}
+
+                          </div>
+
+
+                          <div className="chat-message-bubble">
+                            {item.text}
+                          </div>
 
                         </div>
 
-                      )}
 
+                        {isYou && (
 
-                      <div className="chat-message-wrapper">
+                          <div className="chat-message-avatar your-chat-avatar">
+                            TZ
+                          </div>
 
-                        <div className="chat-message-meta">
-
-                          <strong>
-                            {isYou
-                              ? 'You'
-                              : item.sender}
-                          </strong>
-
-                          {item.time && (
-
-                            <span>
-                              {item.time}
-                            </span>
-
-                          )}
-
-                        </div>
-
-
-                        <div className="chat-message-bubble">
-                          {item.text}
-                        </div>
+                        )}
 
                       </div>
 
-
-                      {isYou && (
-
-                        <div className="chat-message-avatar your-chat-avatar">
-                          TZ
-                        </div>
-
-                      )}
-
-                    </div>
-
-                  )
-
-                })
+                    )
+                  }
+                )
 
               )}
 
@@ -1804,7 +2264,9 @@ useEffect(() => {
 
             <form
               className="chat-message-form"
-              onSubmit={handleSendMessage}
+              onSubmit={
+                handleSendMessage
+              }
             >
 
               <input
@@ -1819,14 +2281,19 @@ useEffect(() => {
                 aria-label="Write a message"
               />
 
+
               <button
                 type="submit"
-                disabled={!message.trim()}
+                disabled={
+                  !message.trim()
+                }
                 aria-label="Send message"
               >
+
                 <span>
                   ➤
                 </span>
+
               </button>
 
             </form>
@@ -1853,7 +2320,8 @@ useEffect(() => {
           className="meeting-tool-overlay"
           onClick={(e) => {
             if (
-              e.target === e.currentTarget
+              e.target ===
+              e.currentTarget
             ) {
               closeTool()
             }
@@ -1863,9 +2331,7 @@ useEffect(() => {
           <div className="meeting-tool-modal">
 
 
-            {/* ========================================
-                TOOL HEADER
-            ======================================== */}
+            {/* TOOL HEADER */}
 
             <div className="meeting-tool-modal-header">
 
@@ -1873,12 +2339,20 @@ useEffect(() => {
 
                 <div className="meeting-tool-modal-icon">
 
-                  {activeTool === 'notes' && '📝'}
-                  {activeTool === 'polls' && '📊'}
-                  {activeTool === 'files' && '📁'}
-                  {activeTool === 'agenda' && '📋'}
+                  {activeTool === 'notes' &&
+                    '📝'}
+
+                  {activeTool === 'polls' &&
+                    '📊'}
+
+                  {activeTool === 'files' &&
+                    '📁'}
+
+                  {activeTool === 'agenda' &&
+                    '📋'}
 
                 </div>
+
 
                 <div>
 
@@ -1919,9 +2393,7 @@ useEffect(() => {
             </div>
 
 
-            {/* ========================================
-                NOTES
-            ======================================== */}
+            {/* NOTES */}
 
             {activeTool === 'notes' && (
 
@@ -1959,10 +2431,13 @@ useEffect(() => {
                     {meetingNote.length} characters
                   </span>
 
+
                   <button
                     type="button"
                     className="meeting-tool-primary"
-                    onClick={saveMeetingNote}
+                    onClick={
+                      saveMeetingNote
+                    }
                   >
                     Save Notes
                   </button>
@@ -1974,9 +2449,7 @@ useEffect(() => {
             )}
 
 
-            {/* ========================================
-                POLLS
-            ======================================== */}
+            {/* POLLS */}
 
             {activeTool === 'polls' && (
 
@@ -2026,6 +2499,7 @@ useEffect(() => {
                       placeholder="Option 1"
                     />
 
+
                     <input
                       type="text"
                       value={pollOptionTwo}
@@ -2073,108 +2547,113 @@ useEffect(() => {
 
                   ) : (
 
-                    polls.map((poll) => {
+                    polls.map(
+                      (poll) => {
 
-                      const totalVotes =
-                        poll.options.reduce(
-                          (
-                            total,
-                            option
-                          ) =>
-                            total +
-                            option.votes,
-                          0
-                        )
-
-                      return (
-
-                        <div
-                          className="poll-card"
-                          key={poll.id}
-                        >
-
-                          <div className="poll-card-question">
-                            {poll.question}
-                          </div>
+                        const totalVotes =
+                          poll.options.reduce(
+                            (
+                              total,
+                              option
+                            ) =>
+                              total +
+                              option.votes,
+                            0
+                          )
 
 
-                          <div className="poll-options">
+                        return (
 
-                            {poll.options.map(
-                              (option) => {
+                          <div
+                            className="poll-card"
+                            key={poll.id}
+                          >
 
-                                const percentage =
-                                  totalVotes > 0
-                                    ? Math.round(
-                                        (
-                                          option.votes /
-                                          totalVotes
-                                        ) *
-                                        100
-                                      )
-                                    : 0
+                            <div className="poll-card-question">
+                              {poll.question}
+                            </div>
 
-                                return (
 
-                                  <button
-                                    type="button"
-                                    className={`poll-option ${
-                                      poll.voted
-                                        ? 'poll-voted'
-                                        : ''
-                                    }`}
-                                    key={option.id}
-                                    onClick={() =>
-                                      votePoll(
-                                        poll.id,
-                                        option.id
-                                      )
-                                    }
-                                    disabled={
-                                      poll.voted
-                                    }
-                                  >
+                            <div className="poll-options">
 
-                                    <span>
-                                      {option.text}
-                                    </span>
+                              {poll.options.map(
+                                (option) => {
 
-                                    {poll.voted && (
+                                  const percentage =
+                                    totalVotes >
+                                    0
+                                      ? Math.round(
+                                          (
+                                            option.votes /
+                                            totalVotes
+                                          ) *
+                                          100
+                                        )
+                                      : 0
+
+
+                                  return (
+
+                                    <button
+                                      type="button"
+                                      className={`poll-option ${
+                                        poll.voted
+                                          ? 'poll-voted'
+                                          : ''
+                                      }`}
+                                      key={option.id}
+                                      onClick={() =>
+                                        votePoll(
+                                          poll.id,
+                                          option.id
+                                        )
+                                      }
+                                      disabled={
+                                        poll.voted
+                                      }
+                                    >
 
                                       <span>
-                                        {percentage}%
+                                        {option.text}
                                       </span>
 
-                                    )}
 
-                                  </button>
+                                      {poll.voted && (
 
-                                )
+                                        <span>
+                                          {percentage}%
+                                        </span>
 
-                              }
-                            )}
+                                      )}
+
+                                    </button>
+
+                                  )
+                                }
+                              )}
+
+                            </div>
+
+
+                            <div className="poll-total">
+
+                              {totalVotes}{' '}
+
+                              {totalVotes ===
+                              1
+                                ? 'vote'
+                                : 'votes'}
+
+                              {poll.voted &&
+                                ' · You voted'}
+
+                            </div>
 
                           </div>
 
-
-                          <div className="poll-total">
-
-                            {totalVotes}{' '}
-
-                            {totalVotes === 1
-                              ? 'vote'
-                              : 'votes'}
-
-                            {poll.voted &&
-                              ' · You voted'}
-
-                          </div>
-
-                        </div>
-
-                      )
-
-                    })
+                        )
+                      }
+                    )
 
                   )}
 
@@ -2185,9 +2664,7 @@ useEffect(() => {
             )}
 
 
-            {/* ========================================
-                FILES
-            ======================================== */}
+            {/* FILES */}
 
             {activeTool === 'files' && (
 
@@ -2217,13 +2694,16 @@ useEffect(() => {
                     }
                   />
 
+
                   <span className="file-upload-icon">
                     ＋
                   </span>
 
+
                   <strong>
                     Add files
                   </strong>
+
 
                   <small>
                     Click to select files
@@ -2234,7 +2714,8 @@ useEffect(() => {
 
                 <div className="meeting-file-list">
 
-                  {meetingFiles.length === 0 ? (
+                  {meetingFiles.length ===
+                  0 ? (
 
                     <div className="tool-empty-state">
 
@@ -2255,52 +2736,55 @@ useEffect(() => {
 
                   ) : (
 
-                    meetingFiles.map((file) => (
+                    meetingFiles.map(
+                      (file) => (
 
-                      <div
-                        className="meeting-file-item"
-                        key={file.id}
-                      >
-
-                        <div className="meeting-file-icon">
-                          📄
-                        </div>
-
-                        <div className="meeting-file-info">
-
-                          <strong>
-                            {file.name}
-                          </strong>
-
-                          <span>
-                            {formatFileSize(
-                              file.size
-                            )}
-                            {' · '}
-                            {formatDate(
-                              file.addedAt
-                            )}
-                          </span>
-
-                        </div>
-
-
-                        <button
-                          type="button"
-                          className="meeting-file-remove"
-                          onClick={() =>
-                            removeFile(
-                              file.id
-                            )
-                          }
-                          aria-label={`Remove ${file.name}`}
+                        <div
+                          className="meeting-file-item"
+                          key={file.id}
                         >
-                          ×
-                        </button>
 
-                      </div>
+                          <div className="meeting-file-icon">
+                            📄
+                          </div>
 
-                    ))
+
+                          <div className="meeting-file-info">
+
+                            <strong>
+                              {file.name}
+                            </strong>
+
+                            <span>
+                              {formatFileSize(
+                                file.size
+                              )}
+                              {' · '}
+                              {formatDate(
+                                file.addedAt
+                              )}
+                            </span>
+
+                          </div>
+
+
+                          <button
+                            type="button"
+                            className="meeting-file-remove"
+                            onClick={() =>
+                              removeFile(
+                                file.id
+                              )
+                            }
+                            aria-label={`Remove ${file.name}`}
+                          >
+                            ×
+                          </button>
+
+                        </div>
+
+                      )
+                    )
 
                   )}
 
@@ -2311,9 +2795,7 @@ useEffect(() => {
             )}
 
 
-            {/* ========================================
-                AGENDA
-            ======================================== */}
+            {/* AGENDA */}
 
             {activeTool === 'agenda' && (
 
@@ -2321,7 +2803,9 @@ useEffect(() => {
 
                 <form
                   className="agenda-create-form"
-                  onSubmit={addAgendaItem}
+                  onSubmit={
+                    addAgendaItem
+                  }
                 >
 
                   <div className="tool-description">
@@ -2351,6 +2835,7 @@ useEffect(() => {
                       placeholder="Add an agenda item..."
                     />
 
+
                     <button
                       type="submit"
                       className="meeting-tool-primary"
@@ -2365,7 +2850,8 @@ useEffect(() => {
 
                 <div className="agenda-list">
 
-                  {agendaItems.length === 0 ? (
+                  {agendaItems.length ===
+                  0 ? (
 
                     <div className="tool-empty-state">
 
@@ -2387,7 +2873,10 @@ useEffect(() => {
                   ) : (
 
                     agendaItems.map(
-                      (item, index) => (
+                      (
+                        item,
+                        index
+                      ) => (
 
                         <div
                           className={`agenda-item ${
@@ -2464,8 +2953,10 @@ useEffect(() => {
    GET MESSAGE AVATAR
 ======================================== */
 
-function selectedInitials(item, meeting) {
-
+function selectedInitials(
+  item,
+  meeting
+) {
   if (item.initials) {
     return item.initials
   }
@@ -2486,7 +2977,9 @@ function selectedInitials(item, meeting) {
 
       return (
         words[0][0] +
-        words[words.length - 1][0]
+        words[
+          words.length - 1
+        ][0]
       ).toUpperCase()
 
     }

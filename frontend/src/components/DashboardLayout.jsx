@@ -1,4 +1,12 @@
 import { NavLink, useNavigate } from 'react-router-dom'
+import {
+  Home,
+  Calendar,
+  MessageSquare,
+  FileText,
+  Settings,
+  Plus
+} from 'lucide-react'
 import '../App.css'
 
 function DashboardLayout({ children }) {
@@ -23,7 +31,7 @@ function DashboardLayout({ children }) {
               `nav-item ${isActive ? 'active' : ''}`
             }
           >
-            <span className="nav-icon">⌂</span>
+            <Home size={18} className="nav-icon" />
             Home
           </NavLink>
 
@@ -35,7 +43,7 @@ function DashboardLayout({ children }) {
               `nav-item ${isActive ? 'active' : ''}`
             }
           >
-            <span className="nav-icon">📅</span>
+            <Calendar size={18} className="nav-icon" />
             Meetings
           </NavLink>
 
@@ -47,7 +55,7 @@ function DashboardLayout({ children }) {
               `nav-item ${isActive ? 'active' : ''}`
             }
           >
-            <span className="nav-icon">▱</span>
+            <MessageSquare size={18} className="nav-icon" />
             Chats
           </NavLink>
 
@@ -59,7 +67,7 @@ function DashboardLayout({ children }) {
               `nav-item ${isActive ? 'active' : ''}`
             }
           >
-            <span className="nav-icon">□</span>
+            <FileText size={18} className="nav-icon" />
             Notes
           </NavLink>
 
@@ -71,7 +79,7 @@ function DashboardLayout({ children }) {
               `nav-item ${isActive ? 'active' : ''}`
             }
           >
-            <span className="nav-icon">⚙</span>
+            <Settings size={18} className="nav-icon" />
             Settings
           </NavLink>
 
@@ -86,7 +94,7 @@ function DashboardLayout({ children }) {
             className="new-meeting-sidebar"
             onClick={() => navigate('/new-meeting')}
           >
-            <span>＋</span>
+            <Plus size={16} />
             New Meeting
           </button>
 

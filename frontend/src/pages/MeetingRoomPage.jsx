@@ -1,6 +1,29 @@
 import { useEffect, useRef, useState } from 'react'
 import { NavLink, useNavigate, useParams } from 'react-router-dom'
 import { apiRequest } from '../services/api'
+import {
+  Mic,
+  MicOff,
+  Video,
+  VideoOff,
+  Share2,
+  Hand,
+  Smile,
+  FileText,
+  BarChart3,
+  ListChecks,
+  Folder,
+  MessageSquare,
+  Users,
+  LogOut,
+  Send,
+  Calendar,
+  Clock,
+  Timer,
+  Check,
+  X
+} from 'lucide-react'
+import { toast, Toaster } from 'sonner'
 import '../App.css'
 
 function MeetingRoomPage() {
@@ -1449,7 +1472,15 @@ function MeetingRoomPage() {
           </strong>
 
           <span>
-            Meeting ID: {meeting.id}
+            ID: #{meeting.id}
+          </span>
+
+          <span style={{ background: 'rgba(16, 185, 129, 0.12)', border: '1px solid rgba(16, 185, 129, 0.3)', color: '#34d399', borderRadius: 4, padding: '2px 8px', fontSize: 11, fontFamily: 'monospace' }}>
+            ● 1080p60
+          </span>
+
+          <span style={{ background: 'rgba(99, 102, 241, 0.12)', border: '1px solid rgba(99, 102, 241, 0.3)', color: '#a5b4fc', borderRadius: 4, padding: '2px 8px', fontSize: 11, fontFamily: 'monospace' }}>
+            🔒 E2E Encrypted
           </span>
 
         </div>
@@ -1459,7 +1490,9 @@ function MeetingRoomPage() {
           type="button"
           className="meeting-room-exit"
           onClick={handleLeaveMeeting}
+          style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}
         >
+          <LogOut size={14} />
           Leave
         </button>
 
@@ -1506,7 +1539,7 @@ function MeetingRoomPage() {
             <div className="meeting-detail-card">
 
               <div className="detail-icon">
-                📅
+                <Calendar size={15} color="#818cf8" />
               </div>
 
               <div className="detail-content">
@@ -1527,7 +1560,7 @@ function MeetingRoomPage() {
             <div className="meeting-detail-card">
 
               <div className="detail-icon">
-                🕐
+                <Clock size={15} color="#818cf8" />
               </div>
 
               <div className="detail-content">
@@ -1548,7 +1581,7 @@ function MeetingRoomPage() {
             <div className="meeting-detail-card">
 
               <div className="detail-icon">
-                ⏱
+                <Timer size={15} color="#818cf8" />
               </div>
 
               <div className="detail-content">
@@ -1569,7 +1602,7 @@ function MeetingRoomPage() {
             <div className="meeting-detail-card">
 
               <div className="detail-icon">
-                👥
+                <Users size={15} color="#818cf8" />
               </div>
 
               <div className="detail-content">
@@ -1638,7 +1671,7 @@ function MeetingRoomPage() {
                 }
               >
                 <span>
-                  📝
+                  <FileText size={16} />
                 </span>
 
                 <span>
@@ -1660,7 +1693,7 @@ function MeetingRoomPage() {
                 }
               >
                 <span>
-                  📊
+                  <BarChart3 size={16} />
                 </span>
 
                 <span>
@@ -1682,7 +1715,7 @@ function MeetingRoomPage() {
                 }
               >
                 <span>
-                  📁
+                  <Folder size={16} />
                 </span>
 
                 <span>
@@ -1704,7 +1737,7 @@ function MeetingRoomPage() {
                 }
               >
                 <span>
-                  📋
+                  <ListChecks size={16} />
                 </span>
 
                 <span>
@@ -1839,8 +1872,8 @@ function MeetingRoomPage() {
 
               <span>
                 {micOn
-                  ? '🎤'
-                  : '🔇'}
+                  ? <Mic size={20} />
+                  : <MicOff size={20} />}
               </span>
 
               <small>
@@ -1871,8 +1904,8 @@ function MeetingRoomPage() {
 
               <span>
                 {cameraOn
-                  ? '📹'
-                  : '🚫'}
+                  ? <Video size={20} />
+                  : <VideoOff size={20} />}
               </span>
 
               <small>
@@ -1900,7 +1933,7 @@ function MeetingRoomPage() {
             >
 
               <span>
-                🖥️
+                <Share2 size={20} />
               </span>
 
               <small>
@@ -1930,7 +1963,7 @@ function MeetingRoomPage() {
             >
 
               <span>
-                ✋
+                <Hand size={20} />
               </span>
 
               <small>
@@ -2015,7 +2048,7 @@ function MeetingRoomPage() {
               >
 
                 <span>
-                  😊
+                  <Smile size={20} />
                 </span>
 
                 <small>
@@ -2135,7 +2168,7 @@ function MeetingRoomPage() {
               <div className="meeting-chat-title">
 
                 <div className="meeting-chat-icon">
-                  💬
+                  <MessageSquare size={16} color="#818cf8" />
                 </div>
 
                 <div>
@@ -2167,7 +2200,7 @@ function MeetingRoomPage() {
                 <div className="chat-empty-state">
 
                   <div className="chat-empty-icon">
-                    💬
+                    <MessageSquare size={32} color="#64748b" />
                   </div>
 
                   <h4>
@@ -2291,7 +2324,7 @@ function MeetingRoomPage() {
               >
 
                 <span>
-                  ➤
+                  <Send size={15} />
                 </span>
 
               </button>
@@ -2340,16 +2373,16 @@ function MeetingRoomPage() {
                 <div className="meeting-tool-modal-icon">
 
                   {activeTool === 'notes' &&
-                    '📝'}
+                    <FileText size={22} color="#818cf8" />}
 
                   {activeTool === 'polls' &&
-                    '📊'}
+                    <BarChart3 size={22} color="#818cf8" />}
 
                   {activeTool === 'files' &&
-                    '📁'}
+                    <Folder size={22} color="#818cf8" />}
 
                   {activeTool === 'agenda' &&
-                    '📋'}
+                    <ListChecks size={22} color="#818cf8" />}
 
                 </div>
 
@@ -2387,7 +2420,7 @@ function MeetingRoomPage() {
                 onClick={closeTool}
                 aria-label="Close"
               >
-                ×
+                <X size={18} />
               </button>
 
             </div>
@@ -2943,6 +2976,8 @@ function MeetingRoomPage() {
         </div>
 
       )}
+
+      <Toaster richColors position="top-right" theme="dark" />
 
     </div>
   )

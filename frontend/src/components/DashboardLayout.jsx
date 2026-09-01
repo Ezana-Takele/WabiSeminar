@@ -19,7 +19,16 @@ function DashboardLayout({ children }) {
       <aside className="sidebar">
 
         <div className="logo">
-          <h2>WabiSeminar</h2>
+          <div className="aerotrace-brand">
+            <div className="aerotrace-emblem">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="12" r="9" />
+                <path d="M12 3v18" />
+                <path d="m16 8-4-4-4 4" />
+              </svg>
+            </div>
+            <h2>WabiSeminar <span className="aerotrace-badge">AERO</span></h2>
+          </div>
         </div>
 
         <nav>

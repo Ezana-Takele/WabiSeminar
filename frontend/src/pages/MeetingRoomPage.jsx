@@ -21,7 +21,8 @@ import {
   Clock,
   Timer,
   Check,
-  X
+  X,
+  UserPlus
 } from 'lucide-react'
 import { toast, Toaster } from 'sonner'
 import '../App.css'
@@ -1486,15 +1487,29 @@ function MeetingRoomPage() {
         </div>
 
 
-        <button
-          type="button"
-          className="meeting-room-exit"
-          onClick={handleLeaveMeeting}
-          style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}
-        >
-          <LogOut size={14} />
-          Leave
-        </button>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <button
+            type="button"
+            className="aerotrace-invite-btn"
+            onClick={() => {
+              navigator.clipboard.writeText(window.location.href)
+              toast.success('Invite link copied to clipboard!')
+            }}
+          >
+            <UserPlus size={14} />
+            Invite
+          </button>
+
+          <button
+            type="button"
+            className="meeting-room-exit"
+            onClick={handleLeaveMeeting}
+            style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}
+          >
+            <LogOut size={14} />
+            Leave
+          </button>
+        </div>
 
       </header>
 

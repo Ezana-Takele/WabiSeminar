@@ -389,35 +389,38 @@ function Dashboard() {
         <header className="topbar">
 
           <div>
-
+            <span className="aerotrace-sub-eyebrow">AEROTRACE COLLABORATION SUITE</span>
             <h1>
-              Good day, {userName} 👋
+              Welcome, {userName}
             </h1>
-
             <p>
-              Ready for your next meeting?
+              High-fidelity conferencing & seminar collaboration
             </p>
-
           </div>
 
-          <div className="user-profile">
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <NavLink
+              to="/new-meeting"
+              className="aerotrace-invite-btn"
+              style={{ textDecoration: 'none' }}
+            >
+              <Plus size={14} />
+              Instant Session
+            </NavLink>
 
-            <div className="avatar">
-              {userInitial}
+            <div className="user-profile">
+              <div className="avatar">
+                {userInitial}
+              </div>
+              <div className="user-info">
+                <strong>
+                  {userName}
+                </strong>
+                <span>
+                  {currentUser?.email || 'Active'}
+                </span>
+              </div>
             </div>
-
-            <div className="user-info">
-
-              <strong>
-                {userName}
-              </strong>
-
-              <span>
-                {currentUser?.email || 'Active'}
-              </span>
-
-            </div>
-
           </div>
 
         </header>

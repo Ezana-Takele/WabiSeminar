@@ -168,11 +168,6 @@ function NotesPage() {
         <header className="notes-header">
 
           <div>
-
-            <span className="notes-eyebrow">
-              WORKSPACE
-            </span>
-
             <h1>
               Notes
             </h1>

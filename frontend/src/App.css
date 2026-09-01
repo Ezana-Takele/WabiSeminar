@@ -4598,14 +4598,8 @@ button[title*="Agenda"]:hover {
 
 /* =========================================================
 /* =========================================================
-   EXECUTIVE MONOCHROME DESIGN SYSTEM
+   EXECUTIVE MINIMALIST WORKSPACE EXTENSIONS
 ========================================================= */
-
-.brand-logo-container {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
 
 .brand-emblem {
   width: 32px;
@@ -4619,8 +4613,7 @@ button[title*="Agenda"]:hover {
   border: 1px solid #27272a;
 }
 
-.invite-pill-button,
-.aerotrace-invite-btn {
+.invite-pill-button {
   height: 36px;
   display: inline-flex;
   align-items: center;
@@ -4637,16 +4630,14 @@ button[title*="Agenda"]:hover {
   transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.invite-pill-button:hover,
-.aerotrace-invite-btn:hover {
+.invite-pill-button:hover {
   background: #f4f4f5;
   border-color: #d4d4d8;
   transform: translateY(-1px);
   box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
 }
 
-.invite-pill-button:active,
-.aerotrace-invite-btn:active {
+.invite-pill-button:active {
   transform: translateY(1px);
 }
 

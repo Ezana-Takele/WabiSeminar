@@ -393,32 +393,21 @@ function Dashboard() {
               Welcome, {userName}
             </h1>
             <p>
-              Manage your upcoming seminars and video meetings.
+              Manage your upcoming seminars and meetings.
             </p>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <NavLink
-              to="/new-meeting"
-              className="invite-pill-button"
-              style={{ textDecoration: 'none' }}
-            >
-              <Plus size={14} />
-              New Meeting
-            </NavLink>
-
-            <div className="user-profile">
-              <div className="avatar">
-                {userInitial}
-              </div>
-              <div className="user-info">
-                <strong>
-                  {userName}
-                </strong>
-                <span>
-                  {currentUser?.email || 'Active'}
-                </span>
-              </div>
+          <div className="user-profile">
+            <div className="avatar">
+              {userInitial}
+            </div>
+            <div className="user-info">
+              <strong>
+                {userName}
+              </strong>
+              <span>
+                {currentUser?.email || 'Active'}
+              </span>
             </div>
           </div>
 

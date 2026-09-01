@@ -4597,16 +4597,17 @@ button[title*="Agenda"]:hover {
 
 
 /* =========================================================
-   AEROTRACE DESIGN SYSTEM EXTENSIONS
+/* =========================================================
+   EXECUTIVE MONOCHROME DESIGN SYSTEM
 ========================================================= */
 
-.aerotrace-brand {
+.brand-logo-container {
   display: flex;
   align-items: center;
   gap: 10px;
 }
 
-.aerotrace-emblem {
+.brand-emblem {
   width: 32px;
   height: 32px;
   display: flex;
@@ -4618,31 +4619,7 @@ button[title*="Agenda"]:hover {
   border: 1px solid #27272a;
 }
 
-.aerotrace-badge {
-  display: inline-block;
-  font-size: 9.5px;
-  font-weight: 800;
-  font-family: monospace;
-  letter-spacing: 0.8px;
-  background: #f4f4f5;
-  border: 1px solid #e4e4e7;
-  color: #71717a;
-  padding: 2px 6px;
-  border-radius: 4px;
-  vertical-align: middle;
-  margin-left: 4px;
-}
-
-.aerotrace-sub-eyebrow {
-  display: block;
-  font-family: monospace;
-  font-size: 10.5px;
-  font-weight: 700;
-  letter-spacing: 1.2px;
-  color: #71717a;
-  margin-bottom: 4px;
-}
-
+.invite-pill-button,
 .aerotrace-invite-btn {
   height: 36px;
   display: inline-flex;
@@ -4660,6 +4637,7 @@ button[title*="Agenda"]:hover {
   transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
+.invite-pill-button:hover,
 .aerotrace-invite-btn:hover {
   background: #f4f4f5;
   border-color: #d4d4d8;
@@ -4667,6 +4645,7 @@ button[title*="Agenda"]:hover {
   box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
 }
 
+.invite-pill-button:active,
 .aerotrace-invite-btn:active {
   transform: translateY(1px);
 }

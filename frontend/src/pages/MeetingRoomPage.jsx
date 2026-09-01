@@ -1486,15 +1486,29 @@ function MeetingRoomPage() {
         </div>
 
 
-        <button
-          type="button"
-          className="meeting-room-exit"
-          onClick={handleLeaveMeeting}
-          style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}
-        >
-          <LogOut size={14} />
-          Leave
-        </button>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <button
+            type="button"
+            className="invite-pill-button"
+            onClick={() => {
+              navigator.clipboard.writeText(window.location.href)
+              toast.success('Meeting invite link copied to clipboard!')
+            }}
+          >
+            <UserPlus size={14} />
+            Invite
+          </button>
+
+          <button
+            type="button"
+            className="meeting-room-exit"
+            onClick={handleLeaveMeeting}
+            style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}
+          >
+            <LogOut size={14} />
+            Leave
+          </button>
+        </div>
 
       </header>
 

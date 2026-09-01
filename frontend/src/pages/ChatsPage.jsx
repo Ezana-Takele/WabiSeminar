@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { NavLink } from 'react-router-dom'
+import DashboardLayout from '../components/DashboardLayout'
 import '../App.css'
 import './ChatsPage.css'
 
@@ -133,157 +134,7 @@ function ChatsPage() {
    */
 
   return (
-
-    <div className="app">
-
-
-      {/* ========================================
-          SIDEBAR
-      ======================================== */}
-
-      <aside className="sidebar">
-
-        <div className="logo">
-
-          <h2>
-            WabiSeminar
-          </h2>
-
-        </div>
-
-
-        <nav>
-
-
-          {/* HOME */}
-
-          <NavLink
-            to="/dashboard"
-            className={({ isActive }) =>
-              `nav-item ${
-                isActive ? 'active' : ''
-              }`
-            }
-          >
-
-            <span className="nav-icon">
-              ⌂
-            </span>
-
-            Home
-
-          </NavLink>
-
-
-          {/* MEETINGS */}
-
-          <NavLink
-            to="/meetings"
-            className={({ isActive }) =>
-              `nav-item ${
-                isActive ? 'active' : ''
-              }`
-            }
-          >
-
-            <span className="nav-icon">
-              📅
-            </span>
-
-            Meetings
-
-          </NavLink>
-
-
-          {/* SAVED CHATS */}
-
-          <NavLink
-            to="/chats"
-            className={({ isActive }) =>
-              `nav-item ${
-                isActive ? 'active' : ''
-              }`
-            }
-          >
-
-            <span className="nav-icon">
-              ▱
-            </span>
-
-            Chats
-
-          </NavLink>
-
-
-          {/* NOTES */}
-
-          <NavLink
-            to="/notes"
-            className={({ isActive }) =>
-              `nav-item ${
-                isActive ? 'active' : ''
-              }`
-            }
-          >
-
-            <span className="nav-icon">
-              □
-            </span>
-
-            Notes
-
-          </NavLink>
-
-
-          {/* SETTINGS */}
-
-          <NavLink
-            to="/settings"
-            className={({ isActive }) =>
-              `nav-item ${
-                isActive ? 'active' : ''
-              }`
-            }
-          >
-
-            <span className="nav-icon">
-              ⚙
-            </span>
-
-            Settings
-
-          </NavLink>
-
-        </nav>
-
-
-        {/* SIDEBAR BOTTOM */}
-
-        <div className="sidebar-bottom">
-
-          <NavLink
-            to="/new-meeting"
-            className="new-meeting-sidebar"
-          >
-
-            <span>
-              ＋
-            </span>
-
-            New Meeting
-
-          </NavLink>
-
-        </div>
-
-      </aside>
-
-
-      {/* ========================================
-          MAIN CONTENT
-      ======================================== */}
-
-      <main className="main-content chats-page">
+    <DashboardLayout>
 
 
         {/* ======================================
@@ -685,9 +536,7 @@ function ChatsPage() {
 
         </section>
 
-      </main>
-
-    </div>
+    </DashboardLayout>
   )
 }
 

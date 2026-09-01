@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { NavLink } from 'react-router-dom'
 import { apiRequest } from '../services/api'
+import DashboardLayout from '../components/DashboardLayout'
 import '../App.css'
 
 function MeetingsPage() {
@@ -588,182 +589,23 @@ function MeetingsPage() {
   ======================================== */
 
   if (loading) {
-
     return (
-
-      <div className="app">
-
-        {/* SIDEBAR */}
-
-        <aside className="sidebar">
-
-          <div className="logo">
-
-            <h2>
-              WabiSeminar
-            </h2>
-
+      <DashboardLayout>
+        <header className="topbar">
+          <div>
+            <h1>Meetings</h1>
+            <p>
+              View your upcoming meetings and complete meeting history.
+            </p>
           </div>
+        </header>
 
-          <nav>
-
-            <NavLink
-              to="/dashboard"
-              className={({ isActive }) =>
-                `nav-item ${
-                  isActive
-                    ? 'active'
-                    : ''
-                }`
-              }
-            >
-
-              <span className="nav-icon">
-                ⌂
-              </span>
-
-              Home
-
-            </NavLink>
-
-            <NavLink
-              to="/meetings"
-              className={({ isActive }) =>
-                `nav-item ${
-                  isActive
-                    ? 'active'
-                    : ''
-                }`
-              }
-            >
-
-              <span className="nav-icon">
-                📅
-              </span>
-
-              Meetings
-
-            </NavLink>
-
-            <NavLink
-              to="/chats"
-              className={({ isActive }) =>
-                `nav-item ${
-                  isActive
-                    ? 'active'
-                    : ''
-                }`
-              }
-            >
-
-              <span className="nav-icon">
-                ▱
-              </span>
-
-              Chats
-
-            </NavLink>
-
-            <NavLink
-              to="/notes"
-              className={({ isActive }) =>
-                `nav-item ${
-                  isActive
-                    ? 'active'
-                    : ''
-                }`
-              }
-            >
-
-              <span className="nav-icon">
-                □
-              </span>
-
-              Notes
-
-            </NavLink>
-
-            <NavLink
-              to="/settings"
-              className={({ isActive }) =>
-                `nav-item ${
-                  isActive
-                    ? 'active'
-                    : ''
-                }`
-              }
-            >
-
-              <span className="nav-icon">
-                ⚙
-              </span>
-
-              Settings
-
-            </NavLink>
-
-          </nav>
-
-          <div className="sidebar-bottom">
-
-            <NavLink
-              to="/new-meeting"
-              className="new-meeting-sidebar"
-            >
-
-              <span>
-                ＋
-              </span>
-
-              New Meeting
-
-            </NavLink>
-
+        <section className="dashboard-section">
+          <div className="empty-state">
+            <h3>Loading meetings...</h3>
           </div>
-
-        </aside>
-
-        {/* MAIN */}
-
-        <main className="main-content">
-
-          <header className="topbar">
-
-            <div>
-
-              <h1>
-                Meetings
-              </h1>
-
-              <p>
-                View your upcoming meetings
-                and complete meeting history.
-              </p>
-
-            </div>
-
-          </header>
-
-          <section className="dashboard-section">
-
-            <div className="empty-state">
-
-              <div className="empty-icon">
-                📅
-              </div>
-
-              <h3>
-                Loading meetings...
-              </h3>
-
-            </div>
-
-          </section>
-
-        </main>
-
-      </div>
-
+        </section>
+      </DashboardLayout>
     )
   }
 
@@ -772,146 +614,7 @@ function MeetingsPage() {
   ======================================== */
 
   return (
-
-    <div className="app">
-
-      {/* ========================================
-          SIDEBAR
-      ======================================== */}
-
-      <aside className="sidebar">
-
-        <div className="logo">
-
-          <h2>
-            WabiSeminar
-          </h2>
-
-        </div>
-
-        <nav>
-
-          <NavLink
-            to="/dashboard"
-            className={({ isActive }) =>
-              `nav-item ${
-                isActive
-                  ? 'active'
-                  : ''
-              }`
-            }
-          >
-
-            <span className="nav-icon">
-              ⌂
-            </span>
-
-            Home
-
-          </NavLink>
-
-          <NavLink
-            to="/meetings"
-            className={({ isActive }) =>
-              `nav-item ${
-                isActive
-                  ? 'active'
-                  : ''
-              }`
-            }
-          >
-
-            <span className="nav-icon">
-              📅
-            </span>
-
-            Meetings
-
-          </NavLink>
-
-          <NavLink
-            to="/chats"
-            className={({ isActive }) =>
-              `nav-item ${
-                isActive
-                  ? 'active'
-                  : ''
-              }`
-            }
-          >
-
-            <span className="nav-icon">
-              ▱
-            </span>
-
-            Chats
-
-          </NavLink>
-
-          <NavLink
-            to="/notes"
-            className={({ isActive }) =>
-              `nav-item ${
-                isActive
-                  ? 'active'
-                  : ''
-              }`
-            }
-          >
-
-            <span className="nav-icon">
-              □
-            </span>
-
-            Notes
-
-          </NavLink>
-
-          <NavLink
-            to="/settings"
-            className={({ isActive }) =>
-              `nav-item ${
-                isActive
-                  ? 'active'
-                  : ''
-              }`
-            }
-          >
-
-            <span className="nav-icon">
-              ⚙
-            </span>
-
-            Settings
-
-          </NavLink>
-
-        </nav>
-
-        <div className="sidebar-bottom">
-
-          <NavLink
-            to="/new-meeting"
-            className="new-meeting-sidebar"
-          >
-
-            <span>
-              ＋
-            </span>
-
-            New Meeting
-
-          </NavLink>
-
-        </div>
-
-      </aside>
-
-      {/* ========================================
-          MAIN CONTENT
-      ======================================== */}
-
-      <main className="main-content">
+    <DashboardLayout>
 
         <header className="topbar">
 
@@ -1116,10 +819,7 @@ function MeetingsPage() {
 
         </section>
 
-      </main>
-
-    </div>
-
+    </DashboardLayout>
   )
 }
 

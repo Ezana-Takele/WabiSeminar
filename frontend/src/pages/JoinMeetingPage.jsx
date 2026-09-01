@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { NavLink, useNavigate, useParams } from 'react-router-dom'
 import { apiRequest } from '../services/api'
+import DashboardLayout from '../components/DashboardLayout'
 import '../App.css'
 
 function JoinMeetingPage() {
@@ -104,25 +105,19 @@ function JoinMeetingPage() {
   */
   if (meetingId) {
     return (
-      <div className="app">
-        <main className="main-content">
-          <section className="dashboard-section">
-            <div className="empty-state">
-              <div className="empty-icon">
-                📅
-              </div>
+      <DashboardLayout>
+        <section className="dashboard-section">
+          <div className="empty-state">
+            <h3>
+              {error || 'Opening meeting...'}
+            </h3>
 
-              <h3>
-                {error || 'Opening meeting...'}
-              </h3>
-
-              <p>
-                Please wait while we open the meeting room.
-              </p>
-            </div>
-          </section>
-        </main>
-      </div>
+            <p>
+              Please wait while we open the meeting room.
+            </p>
+          </div>
+        </section>
+      </DashboardLayout>
     )
   }
 
@@ -130,89 +125,7 @@ function JoinMeetingPage() {
     Normal Join Meeting page
   */
   return (
-    <div className="app">
-
-      {/* Sidebar */}
-      <aside className="sidebar">
-
-        <div className="logo">
-          <h2>WabiSeminar</h2>
-        </div>
-
-        <nav>
-
-          <NavLink
-            to="/dashboard"
-            className="nav-item"
-          >
-            <span className="nav-icon">⌂</span>
-            Home
-          </NavLink>
-
-          <NavLink
-            to="/meetings"
-            className="nav-item"
-          >
-            <span className="nav-icon">📅</span>
-            Meetings
-          </NavLink>
-
-          <a
-            className="nav-item"
-            href="#"
-            onClick={(e) => e.preventDefault()}
-          >
-            <span className="nav-icon">♙</span>
-            People
-          </a>
-
-          <a
-            className="nav-item"
-            href="#"
-            onClick={(e) => e.preventDefault()}
-          >
-            <span className="nav-icon">▱</span>
-            Chats
-          </a>
-
-          <a
-            className="nav-item"
-            href="#"
-            onClick={(e) => e.preventDefault()}
-          >
-            <span className="nav-icon">□</span>
-            Notes
-          </a>
-
-          <a
-            className="nav-item"
-            href="#"
-            onClick={(e) => e.preventDefault()}
-          >
-            <span className="nav-icon">⚙</span>
-            Settings
-          </a>
-
-        </nav>
-
-        <div className="sidebar-bottom">
-
-          <NavLink
-            to="/new-meeting"
-            className="new-meeting-sidebar"
-          >
-            <span>＋</span>
-            New Meeting
-          </NavLink>
-
-        </div>
-
-      </aside>
-
-
-      {/* Main Content */}
-      <main className="main-content">
-
+    <DashboardLayout>
         <header className="topbar">
 
           <div>
@@ -303,9 +216,7 @@ function JoinMeetingPage() {
 
         </section>
 
-      </main>
-
-    </div>
+    </DashboardLayout>
   )
 }
 
